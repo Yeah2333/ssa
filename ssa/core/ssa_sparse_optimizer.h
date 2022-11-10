@@ -22,20 +22,22 @@
 
 namespace ssa {
 
-  struct SSASparseOptimizer :  public QObject, g2o::SparseOptimizer 
-  {
+    struct SSASparseOptimizer : public QObject, g2o::SparseOptimizer {
     Q_OBJECT
-    public:
-    SSASparseOptimizer();
-    ~SSASparseOptimizer();
 
-    virtual void postIteration(int iteration); 
+    public:
+        SSASparseOptimizer();
+
+        ~SSASparseOptimizer();
+
+        virtual void postIteration(int iteration);
 
     signals:
-       void iterationDone();
-  };
 
- 
+        void iterationDone();
+    };
+
+
 } //end namespace
 
 #endif

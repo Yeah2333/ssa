@@ -24,34 +24,36 @@
 
 namespace ssa {
 
-  template <typename EdgeType1, typename EdgeType2, typename EdgeType3>
-  class LocalRefinement{
+    template<typename EdgeType1, typename EdgeType2, typename EdgeType3>
+    class LocalRefinement {
 
-    typedef EdgeType1 SLAMEdgeType;
-    typedef EdgeType2 SensorEdgeType;
-    typedef EdgeType3 DataAssociationEdgeType;
+        typedef EdgeType1 SLAMEdgeType;
+        typedef EdgeType2 SensorEdgeType;
+        typedef EdgeType3 DataAssociationEdgeType;
 
-    typedef typename SensorEdgeType::VertexXiType   PoseVertex;
-    static const int Di = SensorEdgeType::Dimension;
-    typedef Eigen::Matrix<double, Di, Di>  PoseMatrix;
+        typedef typename SensorEdgeType::VertexXiType PoseVertex;
+        static const int Di = SensorEdgeType::Dimension;
+        typedef Eigen::Matrix<double, Di, Di> PoseMatrix;
 
-    typedef typename SensorEdgeType::VertexXjType   PointVertex;
-    static const int Dj = SensorEdgeType::Dimension;
-    typedef Eigen::Matrix<double, Dj, 1> PointVector;
-    typedef Eigen::Matrix<double, Dj, Dj> PointMatrix;
+        typedef typename SensorEdgeType::VertexXjType PointVertex;
+        static const int Dj = SensorEdgeType::Dimension;
+        typedef Eigen::Matrix<double, Dj, 1> PointVector;
+        typedef Eigen::Matrix<double, Dj, Dj> PointMatrix;
 
 
     public:
-    LocalRefinement();
-    ~LocalRefinement();
+        LocalRefinement();
 
-    /** \brief creates data association edges for all available scan pairs  */
-    static void apply(SparseSurfaceAdjustmentGraphT<EdgeType1, EdgeType2, EdgeType3>& graph, SparseSurfaceAdjustmentParams& params, int level);
+        ~LocalRefinement();
 
-    /** \brief creates an edge between reference and correspondence */
-    static void refine(EdgeType3* correspondence, std::vector< PointVertex* >& neighbors);
+        /** \brief creates data association edges for all available scan pairs  */
+        static void apply(SparseSurfaceAdjustmentGraphT<EdgeType1, EdgeType2, EdgeType3> &graph,
+                          SparseSurfaceAdjustmentParams &params, int level);
 
-  };
+        /** \brief creates an edge between reference and correspondence */
+        static void refine(EdgeType3 *correspondence, std::vector<PointVertex *> &neighbors);
+
+    };
 }
 
 #include "local_refinement.hpp"

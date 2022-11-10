@@ -26,29 +26,46 @@
 #include "g2o/core/base_binary_edge.h"
 
 namespace ssa {
-  using namespace Eigen;
-  using namespace g2o;
+    using namespace Eigen;
+    using namespace g2o;
 
-class EdgePointXYCovPointXYCov : public BaseBinaryEdge<2, Eigen::Vector2d, VertexPointXYCov, VertexPointXYCov>
-{
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    EdgePointXYCovPointXYCov();
+    class EdgePointXYCovPointXYCov : public BaseBinaryEdge<2, Eigen::Vector2d, VertexPointXYCov, VertexPointXYCov> {
+    public:
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-    void computeError();
-    
-    static bool DataAssociationEdgeComp (EdgePointXYCovPointXYCov* i,EdgePointXYCovPointXYCov* j) { if(i && j){return (i->chi2()<j->chi2());} else {std::cerr << "DataAssociationEdgeComp: WARNING at least one edge not valid! This might happen due to wrong casting or edge deletion!"; return false;} }
+        EdgePointXYCovPointXYCov();
 
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
+        void computeError();
 
-    virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
-    virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
+        static bool DataAssociationEdgeComp(EdgePointXYCovPointXYCov *i, EdgePointXYCovPointXYCov *j) {
+            if (i && j) {
+                return (i->chi2() < j->chi2());
+            }
+            else {
+                std::cerr
+                        << "DataAssociationEdgeComp: WARNING at least one edge not valid! This might happen due to wrong casting or edge deletion!";
+                return false;
+            }
+        }
+
+        virtual bool read(std::istream &is);
+
+        virtual bool write(std::ostream &os) const;
+
+        virtual void initialEstimate(const OptimizableGraph::VertexSet &from, OptimizableGraph::Vertex *to);
+
+        virtual double initialEstimatePossible(const OptimizableGraph::VertexSet &from, OptimizableGraph::Vertex *to) {
+            (void) to;
+            return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);
+        }
+
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-    virtual void linearizeOplus();
+
+        virtual void linearizeOplus();
+
 #endif
-    bool isMeshEdge;
-};
+        bool isMeshEdge;
+    };
 
 }
 

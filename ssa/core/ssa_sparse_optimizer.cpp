@@ -16,20 +16,17 @@
 
 #include "ssa_sparse_optimizer.h"
 
-namespace ssa{
+namespace ssa {
 
-  SSASparseOptimizer::SSASparseOptimizer() : QObject(), g2o::SparseOptimizer()
-  {
-  }
+    SSASparseOptimizer::SSASparseOptimizer() : QObject(), g2o::SparseOptimizer() {
+    }
 
-  SSASparseOptimizer::~SSASparseOptimizer()
-  {
-  }
+    SSASparseOptimizer::~SSASparseOptimizer() {
+    }
 
-  void SSASparseOptimizer::postIteration(int iteration)
-  {
-    (void) iteration; //remove warning
-    emit iterationDone();
-  };
+    void SSASparseOptimizer::postIteration(int iteration) {
+        (void) iteration; //remove warning
+        emit iterationDone();
+    };
 
 } //end namespace

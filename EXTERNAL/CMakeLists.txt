@@ -8,7 +8,7 @@ IF(SSA_BUILD_SUITESPARSE)
     ExternalProject_Add(
       g2o
       GIT_REPOSITORY https://github.com/RainerKuemmerle/g2o.git
-      GIT_TAG "master"
+      GIT_TAG "20140601_beforeMergeHierarchical"
       PREFIX ${G2O_INSTALL_PREFIX}
       INSTALL_DIR ${G2O_INSTALL_PREFIX}
       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${G2O_INSTALL_PREFIX}
@@ -42,7 +42,7 @@ IF(SSA_BUILD_SUITESPARSE)
 
   ExternalProject_Add( 
     SuiteSparse
-    URL http://www.cise.ufl.edu/research/sparse/SuiteSparse/SuiteSparse-3.6.1.tar.gz
+    URL https://people.engr.tamu.edu/davis/SuiteSparse/SuiteSparse-3.6.1.tar.gz
     DOWNLOAD_DIR ${ssa_SOURCE_DIR}/EXTERNAL/
     SOURCE_DIR ${ssa_SOURCE_DIR}/EXTERNAL/SuiteSparse
     PATCH_COMMAND cp ${ssa_SOURCE_DIR}/EXTERNAL/patches/UFconfig.mk ${ssa_SOURCE_DIR}/EXTERNAL/SuiteSparse/UFconfig/
@@ -61,7 +61,7 @@ ELSE(SSA_BUILD_SUITESPARSE)
     ExternalProject_Add(
       g2o
       GIT_REPOSITORY https://github.com/RainerKuemmerle/g2o.git
-      GIT_TAG "master"
+      GIT_TAG "20140601_beforeMergeHierarchical"
       PREFIX ${G2O_INSTALL_PREFIX}
       INSTALL_DIR ${G2O_INSTALL_PREFIX}
       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${G2O_INSTALL_PREFIX}

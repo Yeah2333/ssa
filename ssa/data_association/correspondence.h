@@ -22,47 +22,51 @@
 
 namespace ssa {
 
-  template <typename PointVertex, typename DataAssociationEdgeType>
-  class CorrespondenceT{
-    
-    public:     
-    CorrespondenceT();
-    CorrespondenceT(const CorrespondenceT<PointVertex,DataAssociationEdgeType>& other);
-    CorrespondenceT(PointVertex* query, PointVertex* correspondence, double distance);
+    template<typename PointVertex, typename DataAssociationEdgeType>
+    class CorrespondenceT {
 
-    PointVertex* query_point;
-    PointVertex* cor_point;
-    double sqrDistance;
-    bool changed;
-    DataAssociationEdgeType* edge;
-  };
-  
-  
-  template <typename PointVertex, typename DataAssociationEdgeType>
-  CorrespondenceT<PointVertex, DataAssociationEdgeType>::CorrespondenceT(): query_point(0), cor_point(0), sqrDistance(0.0), changed(true), edge(0)
-  { 
-  };
-  
-  template <typename PointVertex, typename DataAssociationEdgeType>
-  CorrespondenceT<PointVertex, DataAssociationEdgeType>::CorrespondenceT(PointVertex* query, PointVertex* correspondence, double distance) : query_point(query), cor_point(correspondence), sqrDistance(distance), changed(true), edge(0)
-  { 
+    public:
+        CorrespondenceT();
+
+        CorrespondenceT(const CorrespondenceT<PointVertex, DataAssociationEdgeType> &other);
+
+        CorrespondenceT(PointVertex *query, PointVertex *correspondence, double distance);
+
+        PointVertex *query_point;
+        PointVertex *cor_point;
+        double sqrDistance;
+        bool changed;
+        DataAssociationEdgeType *edge;
+    };
+
+
+    template<typename PointVertex, typename DataAssociationEdgeType>
+    CorrespondenceT<PointVertex, DataAssociationEdgeType>::CorrespondenceT(): query_point(0), cor_point(0),
+                                                                              sqrDistance(0.0), changed(true), edge(0) {
+    };
+
+    template<typename PointVertex, typename DataAssociationEdgeType>
+    CorrespondenceT<PointVertex, DataAssociationEdgeType>::CorrespondenceT(PointVertex *query,
+                                                                           PointVertex *correspondence, double distance)
+            : query_point(query), cor_point(correspondence), sqrDistance(distance), changed(true), edge(0) {
 //     if(query && correspondence){
 //       double dist = (query->estimate() - correspondence->estimate()).squaredNorm();
 //       if(fabs(dist-distance) > 1e-7)
 //         std::cerr << "Provided distance does not match true point pair distance! " << fabs(dist-distance) << std::endl;
 //     }
-  };
-  
+    };
 
-  template <typename PointVertex, typename DataAssociationEdgeType>
-  CorrespondenceT<PointVertex, DataAssociationEdgeType>::CorrespondenceT(const CorrespondenceT<PointVertex, DataAssociationEdgeType>& other): query_point(0), cor_point(0), sqrDistance(0.0), changed(true), edge(0)
-  { 
-    query_point = other.query_point;
-    cor_point = other.cor_point;
-    sqrDistance = other.sqrDistance;
-  };
+
+    template<typename PointVertex, typename DataAssociationEdgeType>
+    CorrespondenceT<PointVertex, DataAssociationEdgeType>::CorrespondenceT(
+            const CorrespondenceT<PointVertex, DataAssociationEdgeType> &other): query_point(0), cor_point(0),
+                                                                                 sqrDistance(0.0), changed(true),
+                                                                                 edge(0) {
+        query_point = other.query_point;
+        cor_point = other.cor_point;
+        sqrDistance = other.sqrDistance;
+    };
 }
-
 
 
 #endif

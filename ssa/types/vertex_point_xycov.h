@@ -16,6 +16,7 @@
 
 #ifndef __SSA_VERTEX_XY_COV_2D__
 #define __SSA_VERTEX_XY_COV_2D__
+
 #include <Eigen/Geometry>
 
 #include "g2o/core/base_vertex.h"
@@ -25,98 +26,103 @@
 
 //forward declaration
 namespace g2o {
-  class VertexSE2;
+    class VertexSE2;
 }
 
 namespace ssa {
 
-  class VertexPointXYCov : public g2o::BaseVertex<2, Eigen::Vector2d>
-  {
+    class VertexPointXYCov : public g2o::BaseVertex<2, Eigen::Vector2d> {
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      VertexPointXYCov();
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-      virtual void setToOriginImpl() {
-        _estimate.setZero();
-      }
+        VertexPointXYCov();
 
-      virtual bool setEstimateDataImpl(const double* est){
-        _estimate[0] = est[0];
-        _estimate[1] = est[1];
-        return true;
-      }
+        virtual void setToOriginImpl() {
+            _estimate.setZero();
+        }
 
-      virtual bool getEstimateData(double* est) const{
-        est[0] = _estimate[0];
-        est[1] = _estimate[1];
-        return true;
-      }
-      
-      virtual int estimateDimension() const { 
-        return 2;
-      }
+        virtual bool setEstimateDataImpl(const double *est) {
+            _estimate[0] = est[0];
+            _estimate[1] = est[1];
+            return true;
+        }
 
-      virtual bool setMinimalEstimateDataImpl(const double* est){
-        return setEstimateData(est);
-      }
+        virtual bool getEstimateData(double *est) const {
+            est[0] = _estimate[0];
+            est[1] = _estimate[1];
+            return true;
+        }
 
-      virtual bool getMinimalEstimateData(double* est) const{
-        return getEstimateData(est);
-      }
-      
-      virtual int minimalEstimateDimension() const { 
-        return 2;
-      }
+        virtual int estimateDimension() const {
+            return 2;
+        }
 
-      virtual void oplusImpl(const double* update)
-      {
-        _estimate[0] += update[0];
-        _estimate[1] += update[1];
-      }
+        virtual bool setMinimalEstimateDataImpl(const double *est) {
+            return setEstimateData(est);
+        }
 
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+        virtual bool getMinimalEstimateData(double *est) const {
+            return getEstimateData(est);
+        }
 
-      /** parent pointer TODO: could be removed... and defined edge dependent*/
+        virtual int minimalEstimateDimension() const {
+            return 2;
+        }
+
+        virtual void oplusImpl(const double *update) {
+            _estimate[0] += update[0];
+            _estimate[1] += update[1];
+        }
+
+        virtual bool read(std::istream &is);
+
+        virtual bool write(std::ostream &os) const;
+
+        /** parent pointer TODO: could be removed... and defined edge dependent*/
     private:
-      g2o::VertexSE2* _parentVertex;
-      unsigned int _parentVertexId;
+        g2o::VertexSE2 *_parentVertex;
+        unsigned int _parentVertexId;
     public:
-      g2o::VertexSE2* parentVertex() const;
-      unsigned int parentVertexId() const;
-      void setParentVertex(g2o::VertexSE2* pose);
+        g2o::VertexSE2 *parentVertex() const;
 
-      /** normal in sensor frame (not saved to disk) */
+        unsigned int parentVertexId() const;
+
+        void setParentVertex(g2o::VertexSE2 *pose);
+
+        /** normal in sensor frame (not saved to disk) */
     private:
-      Eigen::Vector2d    _normal; 
-  
+        Eigen::Vector2d _normal;
+
     public:
-      Eigen::Vector2d& normal();
-      Eigen::Vector2d normal() const;
-      Eigen::Vector2d globalNormal();
-      
-      /** update normal and covariance based on point neighborhoods covariance (experimental) */
-      void updateNormal(Eigen::Matrix2d& cov);
-      
-      bool            _hasNormal;
-  
-    /** Covariance in sensor frame */
+        Eigen::Vector2d &normal();
+
+        Eigen::Vector2d normal() const;
+
+        Eigen::Vector2d globalNormal();
+
+        /** update normal and covariance based on point neighborhoods covariance (experimental) */
+        void updateNormal(Eigen::Matrix2d &cov);
+
+        bool _hasNormal;
+
+        /** Covariance in sensor frame */
     private:
-      Eigen::Matrix2d _cov; 
-    public: 
-      Eigen::Matrix2d covariance() const;
-      Eigen::Matrix2d& covariance();
+        Eigen::Matrix2d _cov;
+    public:
+        Eigen::Matrix2d covariance() const;
 
-    std::deque< VertexPointXYCov* >  neighbors;
+        Eigen::Matrix2d &covariance();
 
-    /** color information per point */
-    unsigned char cr;
-    unsigned char cg;
-    unsigned char cb;
+        std::deque<VertexPointXYCov *> neighbors;
 
-    /** ratio between eigenvalues */
-    double ratio;
-  };
+        /** color information per point */
+        unsigned char cr;
+        unsigned char cg;
+        unsigned char cb;
+
+        /** ratio between eigenvalues */
+        double ratio;
+    };
 
 }
 #endif

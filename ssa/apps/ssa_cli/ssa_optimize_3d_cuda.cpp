@@ -27,107 +27,103 @@
 using namespace std;
 using namespace ssa;
 
-const char *message[]={
-  "ssa_optimize: optimizes a given ssa file",
-  "usage ssa_optimize [options] <ssa_file>",
-  "options:",
-  "-ini filename  provide parameter set in an ini file.",
-  "-o [filename]  save result in given file",
-  0
+const char *message[] = {
+        "ssa_optimize: optimizes a given ssa file",
+        "usage ssa_optimize [options] <ssa_file>",
+        "options:",
+        "-ini filename  provide parameter set in an ini file.",
+        "-o [filename]  save result in given file",
+        0
 };
 
 static bool running = true;
 unsigned int breakCounter = 0;
 
-void sighandler(int sig)
-{
+void sighandler(int sig) {
     cout << endl << "Signal " << sig << " caught..." << endl;
 
-   running = false;
-   breakCounter++;
-   if(breakCounter >= 3){
-      exit(1);
-   }
+    running = false;
+    breakCounter++;
+    if (breakCounter >= 3) {
+        exit(1);
+    }
 }
 
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 
-  const char**v=message;
-  while (*v){
-    cout << *v << endl;
-    v++;
-  }
-
-  // HACK reset numeric locale, we need C
-  setlocale (LC_NUMERIC,"C");
-  int c=1;
-  const char* logfile=0;
-  const char* outfile=0;
-  bool saveOutput = false;
-
-  bool useConfigFile = false;
-  const char* configFile=0;
- 
-  while (c<argc){
-    if (!strcmp(argv[c],"-o")){
-      saveOutput = true;
-      c++;
-      outfile=argv[c];
-      c++;
-    } else
-     if (!strcmp(argv[c],"-ini")){
-      useConfigFile=true;
-      c++;
-      configFile = argv[c];
-      c++;
-    } else 
-    if (! logfile){
-      logfile=argv[c];
-      c++;
-      break;
+    const char **v = message;
+    while (*v) {
+        cout << *v << endl;
+        v++;
     }
-  }
 
-  if(!logfile){
-    cerr << "Error: no input ssa file given." << endl;
-    exit(0);
-  }
-  if(!outfile){
-    cerr << "Warning: missing output file." << endl;
-  }
+    // HACK reset numeric locale, we need C
+    setlocale(LC_NUMERIC, "C");
+    int c = 1;
+    const char *logfile = 0;
+    const char *outfile = 0;
+    bool saveOutput = false;
 
-  //initialize optimizer
-  SparseSurfaceAdjustmentT<g2o::EdgeSE3, ssa::EdgeSE3PointXYZCov, ssa::EdgePointXYZCovPointXYZCov> ssa;
-  ssa.setVerbose(true);
-  //g2o::BlockSolverX::LinearSolverType* linearSolver = new g2o::LinearSolverPCG<g2o::BlockSolverX::PoseMatrixType>;
-  g2o::BlockSolverX::LinearSolverType* linearSolver = new g2o::LinearSolverCUDACG<g2o::BlockSolverX::PoseMatrixType>;
-  //g2o::BlockSolverX::LinearSolverType* linearSolver = new g2o::LinearSolverCuspCG<g2o::BlockSolverX::PoseMatrixType>;
+    bool useConfigFile = false;
+    const char *configFile = 0;
 
-  ssa.setSolver(linearSolver);
+    while (c < argc) {
+        if (!strcmp(argv[c], "-o")) {
+            saveOutput = true;
+            c++;
+            outfile = argv[c];
+            c++;
+        } else if (!strcmp(argv[c], "-ini")) {
+            useConfigFile = true;
+            c++;
+            configFile = argv[c];
+            c++;
+        } else if (!logfile) {
+            logfile = argv[c];
+            c++;
+            break;
+        }
+    }
 
-  if (! logfile){
+    if (!logfile) {
+        cerr << "Error: no input ssa file given." << endl;
+        exit(0);
+    }
+    if (!outfile) {
+        cerr << "Warning: missing output file." << endl;
+    }
 
-  } else {
-    ssa.graph()->load(logfile);
-  }
+    //initialize optimizer
+    SparseSurfaceAdjustmentT<g2o::EdgeSE3, ssa::EdgeSE3PointXYZCov, ssa::EdgePointXYZCovPointXYZCov> ssa;
+    ssa.setVerbose(true);
+    //g2o::BlockSolverX::LinearSolverType* linearSolver = new g2o::LinearSolverPCG<g2o::BlockSolverX::PoseMatrixType>;
+    g2o::BlockSolverX::LinearSolverType *linearSolver = new g2o::LinearSolverCUDACG<g2o::BlockSolverX::PoseMatrixType>;
+    //g2o::BlockSolverX::LinearSolverType* linearSolver = new g2o::LinearSolverCuspCG<g2o::BlockSolverX::PoseMatrixType>;
 
-  if(useConfigFile){
-    ifstream configStream(configFile);
-    ssa.params().readParams(configStream);
-    configStream.close();
-    ssa.params().printParams();
-  }
-  //omp_set_num_threads(1);
-  double startTime = get_time();
-  ssa.optimize(); 
-  cerr << "calculation took " << get_time() - startTime << " seconds." << endl;
+    ssa.setSolver(linearSolver);
 
-  if(saveOutput){
-    cerr << "wrote resulting graph to " << outfile << endl;
-    ssa.graph()->save(outfile);
-  }
+    if (!logfile) {
 
-  return 0;
+    } else {
+        ssa.graph()->load(logfile);
+    }
+
+    if (useConfigFile) {
+        ifstream configStream(configFile);
+        ssa.params().readParams(configStream);
+        configStream.close();
+        ssa.params().printParams();
+    }
+    //omp_set_num_threads(1);
+    double startTime = get_time();
+    ssa.optimize();
+    cerr << "calculation took " << get_time() - startTime << " seconds." << endl;
+
+    if (saveOutput) {
+        cerr << "wrote resulting graph to " << outfile << endl;
+        ssa.graph()->save(outfile);
+    }
+
+    return 0;
 }

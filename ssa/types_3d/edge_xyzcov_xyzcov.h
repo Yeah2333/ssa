@@ -26,29 +26,39 @@
 #include "g2o/core/base_binary_edge.h"
 
 namespace ssa {
-  using namespace Eigen;
-  using namespace g2o;
+    using namespace Eigen;
+    using namespace g2o;
 
-class EdgePointXYZCovPointXYZCov : public BaseBinaryEdge<3, Eigen::Vector3d, VertexPointXYZCov, VertexPointXYZCov>
-{
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    EdgePointXYZCovPointXYZCov();
+    class EdgePointXYZCovPointXYZCov : public BaseBinaryEdge<3, Eigen::Vector3d, VertexPointXYZCov, VertexPointXYZCov> {
+    public:
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-    void computeError();
+        EdgePointXYZCovPointXYZCov();
 
-    static bool DataAssociationEdgeComp (EdgePointXYZCovPointXYZCov* i,EdgePointXYZCovPointXYZCov* j) { return (i->chi2()<j->chi2()); }
+        void computeError();
 
-    virtual bool read(std::istream& is);
-    virtual bool write(std::ostream& os) const;
+        static bool DataAssociationEdgeComp(EdgePointXYZCovPointXYZCov *i, EdgePointXYZCovPointXYZCov *j) {
+            return (i->chi2() < j->chi2());
+        }
 
-    virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
-    virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
+        virtual bool read(std::istream &is);
+
+        virtual bool write(std::ostream &os) const;
+
+        virtual void initialEstimate(const OptimizableGraph::VertexSet &from, OptimizableGraph::Vertex *to);
+
+        virtual double initialEstimatePossible(const OptimizableGraph::VertexSet &from, OptimizableGraph::Vertex *to) {
+            (void) to;
+            return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);
+        }
+
 #ifndef NUMERIC_JACOBIAN_THREE_D_TYPES
-    virtual void linearizeOplus();
+
+        virtual void linearizeOplus();
+
 #endif
 
-};
+    };
 
 }
 #endif

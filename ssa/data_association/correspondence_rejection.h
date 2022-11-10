@@ -23,33 +23,38 @@
 
 namespace ssa {
 
-  template <typename EdgeType1, typename EdgeType2, typename EdgeType3>
-  class CorrespondenceRejectionT{
+    template<typename EdgeType1, typename EdgeType2, typename EdgeType3>
+    class CorrespondenceRejectionT {
 
-    typedef EdgeType1 SLAMEdgeType;
-    typedef EdgeType2 SensorEdgeType;
-    typedef EdgeType3 DataAssociationEdgeType;
+        typedef EdgeType1 SLAMEdgeType;
+        typedef EdgeType2 SensorEdgeType;
+        typedef EdgeType3 DataAssociationEdgeType;
 
-    typedef typename SensorEdgeType::VertexXiType   PoseVertex;
-    static const int Di = SensorEdgeType::Dimension;
-    typedef Eigen::Matrix<double, Di, Di>  PoseMatrix;
+        typedef typename SensorEdgeType::VertexXiType PoseVertex;
+        static const int Di = SensorEdgeType::Dimension;
+        typedef Eigen::Matrix<double, Di, Di> PoseMatrix;
 
-    typedef typename SensorEdgeType::VertexXjType   PointVertex;
-    static const int Dj = SensorEdgeType::Dimension;
-    typedef Eigen::Matrix<double, Dj, 1> PointVector;
-    typedef Eigen::Matrix<double, Dj, Dj> PointMatrix;
+        typedef typename SensorEdgeType::VertexXjType PointVertex;
+        static const int Dj = SensorEdgeType::Dimension;
+        typedef Eigen::Matrix<double, Dj, 1> PointVector;
+        typedef Eigen::Matrix<double, Dj, Dj> PointMatrix;
 
-    typedef KDTreeFlannT<PointVertex>     PointTree;
+        typedef KDTreeFlannT<PointVertex> PointTree;
 
     public:
-    CorrespondenceRejectionT();
-    ~CorrespondenceRejectionT();
+        CorrespondenceRejectionT();
 
-    static bool isValid(PointVertex*& reference, PointVertex*& correspondence, double& maxAngleDifference);
-    static bool isValid(PointVertex*& reference, PointVertex*& correspondence, double& maxAngleDifference, double& maxColorChannel);
-    static bool isValid(CorrespondenceT<PointVertex, EdgeType3>& correspondence, double& maxAngleDifference, double& maxColorChannel);
+        ~CorrespondenceRejectionT();
 
-  };
+        static bool isValid(PointVertex *&reference, PointVertex *&correspondence, double &maxAngleDifference);
+
+        static bool isValid(PointVertex *&reference, PointVertex *&correspondence, double &maxAngleDifference,
+                            double &maxColorChannel);
+
+        static bool isValid(CorrespondenceT<PointVertex, EdgeType3> &correspondence, double &maxAngleDifference,
+                            double &maxColorChannel);
+
+    };
 }
 
 #include "correspondence_rejection.hpp"

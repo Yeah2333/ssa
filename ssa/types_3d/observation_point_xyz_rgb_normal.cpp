@@ -18,62 +18,63 @@
 #include "observation_point_xyz_rgb_normal.h"
 
 namespace ssa {
-  using namespace Eigen;
+    using namespace Eigen;
 
-  ObservationXYZRGBNormal::ObservationXYZRGBNormal() : measurement(Eigen::Vector3d::Zero()), estimate(Eigen::Vector3d::Zero()), normal(Eigen::Vector3d::Zero()), rgb(Eigen::Vector3i::Zero()), level(0)
-  {
+    ObservationXYZRGBNormal::ObservationXYZRGBNormal() : measurement(Eigen::Vector3d::Zero()),
+                                                         estimate(Eigen::Vector3d::Zero()),
+                                                         normal(Eigen::Vector3d::Zero()), rgb(Eigen::Vector3i::Zero()),
+                                                         level(0) {
 
-  }
+    }
 
-  ObservationXYZRGBNormal::ObservationXYZRGBNormal(Eigen::Vector3d& m, Eigen::Vector3d& e, Eigen::Vector3d& n, Eigen::Vector3i& color, int l) : measurement(m), estimate(e), normal(n), rgb(color), level(l)
-  {
+    ObservationXYZRGBNormal::ObservationXYZRGBNormal(Eigen::Vector3d &m, Eigen::Vector3d &e, Eigen::Vector3d &n,
+                                                     Eigen::Vector3i &color, int l) : measurement(m), estimate(e),
+                                                                                      normal(n), rgb(color), level(l) {
 
-  };
+    };
 
 
-  bool ObservationXYZRGBNormal::read(std::istream& is)
-  {
-    /// measurement in sensor frame
-    for(int i = 0; i < 3; ++i)
-      is >> measurement(i);
+    bool ObservationXYZRGBNormal::read(std::istream &is) {
+        /// measurement in sensor frame
+        for (int i = 0; i < 3; ++i)
+            is >> measurement(i);
 
-   /// estimate in global frame
-    for(int i = 0; i < 3; ++i)
-      is >> estimate(i);
+        /// estimate in global frame
+        for (int i = 0; i < 3; ++i)
+            is >> estimate(i);
 
-    /// normal in local frame
-    for(int i = 0; i < 3; ++i)
-      is >> normal(i);
+        /// normal in local frame
+        for (int i = 0; i < 3; ++i)
+            is >> normal(i);
 
-    /// color as r,g,b
-    for(int i = 0; i < 3; ++i)
-      is >> rgb(i);
+        /// color as r,g,b
+        for (int i = 0; i < 3; ++i)
+            is >> rgb(i);
 
-    is >> level;
-    return true;
-  }
+        is >> level;
+        return true;
+    }
 
-  bool ObservationXYZRGBNormal::write(std::ostream& os) const
-  {
-    /// measurement in sensor frame
-    for(int i = 0; i < 3; ++i)
-      os << measurement(i) << " ";
+    bool ObservationXYZRGBNormal::write(std::ostream &os) const {
+        /// measurement in sensor frame
+        for (int i = 0; i < 3; ++i)
+            os << measurement(i) << " ";
 
-    /// estimate in global frame
-    for(int i = 0; i < 3; ++i)
-      os << estimate(i) << " ";
+        /// estimate in global frame
+        for (int i = 0; i < 3; ++i)
+            os << estimate(i) << " ";
 
-    /// normal in local frame
-    for(int i = 0; i < 3; ++i)
-      os << normal(i) << " ";
+        /// normal in local frame
+        for (int i = 0; i < 3; ++i)
+            os << normal(i) << " ";
 
-    /// color as r,g,b
-    for(int i = 0; i < 3; ++i)
-      os << rgb(i) << " ";
+        /// color as r,g,b
+        for (int i = 0; i < 3; ++i)
+            os << rgb(i) << " ";
 
-    os << level << " ";
-    return os.good();
-  }
+        os << level << " ";
+        return os.good();
+    }
 
 } //end namespace
 

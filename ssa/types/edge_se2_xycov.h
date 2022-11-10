@@ -24,31 +24,38 @@
 #include "g2o/core/base_binary_edge.h"
 
 namespace ssa {
-  using namespace Eigen;
-  using namespace g2o;
+    using namespace Eigen;
+    using namespace g2o;
 
-  class EdgeSE2PointXYCov : public g2o::BaseBinaryEdge<2, Eigen::Vector2d, g2o::VertexSE2, VertexPointXYCov>
-  {
+    class EdgeSE2PointXYCov : public g2o::BaseBinaryEdge<2, Eigen::Vector2d, g2o::VertexSE2, VertexPointXYCov> {
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      EdgeSE2PointXYCov();
-      void computeError()
-      {
-        const VertexSE2* v1 = static_cast<const VertexSE2*>(_vertices[0]);
-        const VertexPointXYCov* l2 = static_cast<const VertexPointXYCov*>(_vertices[1]);
-        _error = (v1->estimate().inverse() * l2->estimate()) - _measurement;
-      }
-  
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
-  
-      virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
-  
-  #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-      virtual void linearizeOplus();
-  #endif
-  };
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+        EdgeSE2PointXYCov();
+
+        void computeError() {
+            const VertexSE2 *v1 = static_cast<const VertexSE2 *>(_vertices[0]);
+            const VertexPointXYCov *l2 = static_cast<const VertexPointXYCov *>(_vertices[1]);
+            _error = (v1->estimate().inverse() * l2->estimate()) - _measurement;
+        }
+
+        virtual bool read(std::istream &is);
+
+        virtual bool write(std::ostream &os) const;
+
+        virtual void initialEstimate(const OptimizableGraph::VertexSet &from, OptimizableGraph::Vertex *to);
+
+        virtual double initialEstimatePossible(const OptimizableGraph::VertexSet &from, OptimizableGraph::Vertex *to) {
+            (void) to;
+            return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);
+        }
+
+#ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
+
+        virtual void linearizeOplus();
+
+#endif
+    };
 
 } //end namespace
 

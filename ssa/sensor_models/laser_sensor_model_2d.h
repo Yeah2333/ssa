@@ -21,36 +21,39 @@
 
 #include "ssa/core/ssa_graph_2d.h"
 
-namespace ssa{
+namespace ssa {
 
-  struct LaserSensorParams{
+    struct LaserSensorParams {
 
-      inline LaserSensorParams(){
-        maxRange = 80.0;
-        angularResolution = DEG2RAD(0.5);
-        sensorPrecision = 0.01;
-        scale = 0.5;
-      }
+        inline LaserSensorParams() {
+            maxRange = 80.0;
+            angularResolution = DEG2RAD(0.5);
+            sensorPrecision = 0.01;
+            scale = 0.5;
+        }
 
-      double maxRange;
-      double angularResolution;
-      double sensorPrecision;
-      double scale;
-  };
+        double maxRange;
+        double angularResolution;
+        double sensorPrecision;
+        double scale;
+    };
 
-  class LaserSensorModel2D{
+    class LaserSensorModel2D {
 
     public:
-    LaserSensorModel2D();
-    ~LaserSensorModel2D();
+        LaserSensorModel2D();
 
-    //--------------------------
-    // Laser sensor model
-    //--------------------------
-    static void applySensorModel(SparseSurfaceAdjustmentGraph2D& ssaGraph, LaserSensorParams& params);
-    static void setInformationForVertexPoint(EdgeSE2PointXYCov*& edge, VertexPointXYCov*& point, LaserSensorParams& params);
+        ~LaserSensorModel2D();
 
-  };
+        //--------------------------
+        // Laser sensor model
+        //--------------------------
+        static void applySensorModel(SparseSurfaceAdjustmentGraph2D &ssaGraph, LaserSensorParams &params);
+
+        static void
+        setInformationForVertexPoint(EdgeSE2PointXYCov *&edge, VertexPointXYCov *&point, LaserSensorParams &params);
+
+    };
 
 }
 #endif

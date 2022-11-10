@@ -24,35 +24,41 @@
 #include "g2o/core/base_binary_edge.h"
 
 namespace ssa {
-  using namespace Eigen;
-  using namespace g2o;
+    using namespace Eigen;
+    using namespace g2o;
 
-  class EdgeSE3PointXYZCov : public g2o::BaseBinaryEdge<3, Eigen::Vector3d, g2o::VertexSE3, VertexPointXYZCov>
-  {
+    class EdgeSE3PointXYZCov : public g2o::BaseBinaryEdge<3, Eigen::Vector3d, g2o::VertexSE3, VertexPointXYZCov> {
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-      EdgeSE3PointXYZCov();
-      ~EdgeSE3PointXYZCov();
+        EdgeSE3PointXYZCov();
 
-      void computeError()
-      {
-        const g2o::VertexSE3* v1 = dynamic_cast<const g2o::VertexSE3*>(vertices()[0]);
-        const VertexPointXYZCov* l2 = dynamic_cast<const VertexPointXYZCov*>(vertices()[1]);
-        _error = (v1->estimate() * _measurement) - l2->estimate();
-      }
-  
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
-  
-      virtual void initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to);
-      virtual double initialEstimatePossible(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to) { (void) to; return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);}
+        ~EdgeSE3PointXYZCov();
 
-      //virtual void linearizeOplus();
-      inline int level() { return level_;}
-      inline void setLevel(int level) { level_ = level;}
-      int level_;
-  };
+        void computeError() {
+            const g2o::VertexSE3 *v1 = dynamic_cast<const g2o::VertexSE3 *>(vertices()[0]);
+            const VertexPointXYZCov *l2 = dynamic_cast<const VertexPointXYZCov *>(vertices()[1]);
+            _error = (v1->estimate() * _measurement) - l2->estimate();
+        }
+
+        virtual bool read(std::istream &is);
+
+        virtual bool write(std::ostream &os) const;
+
+        virtual void initialEstimate(const OptimizableGraph::VertexSet &from, OptimizableGraph::Vertex *to);
+
+        virtual double initialEstimatePossible(const OptimizableGraph::VertexSet &from, OptimizableGraph::Vertex *to) {
+            (void) to;
+            return (from.count(_vertices[0]) == 1 ? 1.0 : -1.0);
+        }
+
+        //virtual void linearizeOplus();
+        inline int level() { return level_; }
+
+        inline void setLevel(int level) { level_ = level; }
+
+        int level_;
+    };
 
 } //end namespace
 

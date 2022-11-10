@@ -27,8 +27,8 @@
 //Include ssa_graph template
 #include "ssa/core/ssa_graph.h"
 
-namespace ssa{
-  typedef SparseSurfaceAdjustmentGraphT<EdgeSE2, EdgeSE2PointXYCov, EdgePointXYCovPointXYCov> SparseSurfaceAdjustmentGraph2D;
+namespace ssa {
+    typedef SparseSurfaceAdjustmentGraphT<EdgeSE2, EdgeSE2PointXYCov, EdgePointXYCovPointXYCov> SparseSurfaceAdjustmentGraph2D;
 }
 
 #endif

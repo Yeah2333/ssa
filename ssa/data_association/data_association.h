@@ -18,7 +18,7 @@
 #define __SSA_DATA_ASSOCIATION__
 
 #include <vector>
-#include <tr1/unordered_map> 
+#include <tr1/unordered_map>
 /** graph and param struct */
 #include "ssa/core/parameter.h"
 #include "ssa/core/ssa_graph.h"
@@ -29,46 +29,53 @@
 
 namespace ssa {
 
-  template <typename EdgeType1, typename EdgeType2, typename EdgeType3>
-  class DataAssociationT{
+    template<typename EdgeType1, typename EdgeType2, typename EdgeType3>
+    class DataAssociationT {
 
-    typedef EdgeType1 SLAMEdgeType;
-    typedef EdgeType2 SensorEdgeType;
-    typedef EdgeType3 DataAssociationEdgeType;
+        typedef EdgeType1 SLAMEdgeType;
+        typedef EdgeType2 SensorEdgeType;
+        typedef EdgeType3 DataAssociationEdgeType;
 
-    typedef typename SensorEdgeType::VertexXjType   PointVertex;
+        typedef typename SensorEdgeType::VertexXjType PointVertex;
 
 
-    typedef typename NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::Correspondence     Correspondence;
-    typedef typename NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::CorrespondenceList CorrespondenceList;
-    typedef typename NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::OverlapMap         OverlapMap;
-  
-    public:     
-    DataAssociationT();
+        typedef typename NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::Correspondence Correspondence;
+        typedef typename NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::CorrespondenceList CorrespondenceList;
+        typedef typename NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::OverlapMap OverlapMap;
 
-    /** \brief creates data association edges for all available scan pairs  */
-    void apply(SparseSurfaceAdjustmentGraphT<EdgeType1, EdgeType2, EdgeType3>& graph, SparseSurfaceAdjustmentParams& params, int level);
+    public:
+        DataAssociationT();
 
-    void applyBasedOnOverlap(SparseSurfaceAdjustmentGraphT<EdgeType1, EdgeType2, EdgeType3>& graph, SparseSurfaceAdjustmentParams& params, int level);
+        /** \brief creates data association edges for all available scan pairs  */
+        void apply(SparseSurfaceAdjustmentGraphT<EdgeType1, EdgeType2, EdgeType3> &graph,
+                   SparseSurfaceAdjustmentParams &params, int level);
 
-    OverlapMap overlap(SparseSurfaceAdjustmentGraphT<EdgeType1, EdgeType2, EdgeType3>& graph, SparseSurfaceAdjustmentParams& params, int level);
+        void applyBasedOnOverlap(SparseSurfaceAdjustmentGraphT<EdgeType1, EdgeType2, EdgeType3> &graph,
+                                 SparseSurfaceAdjustmentParams &params, int level);
 
-    CorrespondenceList correspondences;
+        OverlapMap overlap(SparseSurfaceAdjustmentGraphT<EdgeType1, EdgeType2, EdgeType3> &graph,
+                           SparseSurfaceAdjustmentParams &params, int level);
 
-    enum  Strategy{BRUTEFORCE, KDTREE, LOCAL, SPARSE_KDTREE_LOCAL};
-    /** getter / setter for search strategy, default search strategy is KDTREE */
-    inline void setStrategy(Strategy strategy){strategy_ = strategy;}
-    inline Strategy& strategy(){return strategy_ ;}
+        CorrespondenceList correspondences;
+
+        enum Strategy {
+            BRUTEFORCE, KDTREE, LOCAL, SPARSE_KDTREE_LOCAL
+        };
+
+        /** getter / setter for search strategy, default search strategy is KDTREE */
+        inline void setStrategy(Strategy strategy) { strategy_ = strategy; }
+
+        inline Strategy &strategy() { return strategy_; }
 
     private:
-      /** \brief search strategy for corresponding vertices of different scans, default KDTREE */
-      Strategy    strategy_; 
-      OverlapMap  overlap_;
-  };
+        /** \brief search strategy for corresponding vertices of different scans, default KDTREE */
+        Strategy strategy_;
+        OverlapMap overlap_;
+    };
 
-  #include "data_association.hpp"
+#include "data_association.hpp"
+
 }
-
 
 
 #endif

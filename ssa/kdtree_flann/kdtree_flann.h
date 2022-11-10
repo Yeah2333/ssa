@@ -21,68 +21,73 @@
 #include "ssa/core/ssa_graph.h"
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"  // Do not show warnings from PCL or FLANN
+
 #include <flann/flann.hpp>
+
 #pragma GCC diagnostic warning "-Wunused-parameter"
+
 #include "g2o/stuff/timeutil.h"
 
 namespace ssa {
 
-  template <typename PointVertexType>
-  class KDTreeFlannT{
+    template<typename PointVertexType>
+    class KDTreeFlannT {
 
     public:
-    KDTreeFlannT();
-    KDTreeFlannT(int dim);
-    ~KDTreeFlannT();
+        KDTreeFlannT();
 
-    /** \brief copies point information from vertices to internal FLANN structure
-        \param useVectorIndices 
-         true: the index of the input vector is returned during search 
-         false: the vertex id is returned during search
-    */
-    void copyData(std::vector<PointVertexType* >& vertices, bool useVectorIndices);
+        KDTreeFlannT(int dim);
 
-    void createKDTree();
+        ~KDTreeFlannT();
 
-    void nearestKSearch(const PointVertexType* vertex, int k, 
-                                       std::vector<int> &k_indices, 
-                                       std::vector<float> &k_squared_distances);
+        /** \brief copies point information from vertices to internal FLANN structure
+            \param useVectorIndices
+             true: the index of the input vector is returned during search
+             false: the vertex id is returned during search
+        */
+        void copyData(std::vector<PointVertexType *> &vertices, bool useVectorIndices);
 
-    void nearestKSearch(const Eigen::Vector3f& point, int k, 
-                                       std::vector<int> &k_indices, 
-                                       std::vector<float> &k_squared_distances);
+        void createKDTree();
 
-    int radiusSearch(const PointVertexType* vertex, double radius, std::vector<int> &k_indices,
-                                          std::vector<float> &k_squared_distances, int max_nn) const;
+        void nearestKSearch(const PointVertexType *vertex, int k,
+                            std::vector<int> &k_indices,
+                            std::vector<float> &k_squared_distances);
 
-    int neighborsInRadius(const PointVertexType* vertex, double radius) const;
+        void nearestKSearch(const Eigen::Vector3f &point, int k,
+                            std::vector<int> &k_indices,
+                            std::vector<float> &k_squared_distances);
 
-    void clear();
+        int radiusSearch(const PointVertexType *vertex, double radius, std::vector<int> &k_indices,
+                         std::vector<float> &k_squared_distances, int max_nn) const;
 
-    static void vectorize(unsigned int dim, const PointVertexType* vertex, std::vector<float>& vec);
+        int neighborsInRadius(const PointVertexType *vertex, double radius) const;
 
-    static void vectorize(unsigned int dim, const Eigen::Vector3f& point, std::vector<float>& vec);
+        void clear();
 
-    /** \brief mapping between internal and external indices. */
-    std::vector<int> index_mapping_;
+        static void vectorize(unsigned int dim, const PointVertexType *vertex, std::vector<float> &vec);
 
-    /** \brief Internal pointer to data. */
-    float* data_;
+        static void vectorize(unsigned int dim, const Eigen::Vector3f &point, std::vector<float> &vec);
 
-    /** \brief Tree dimensionality (i.e. the number of dimensions per point). */
-    int dim_;
+        /** \brief mapping between internal and external indices. */
+        std::vector<int> index_mapping_;
 
-    /** \brief A FLANN index object. */
-    flann::Index<flann::L2_Simple<float> >* flann_index_;
+        /** \brief Internal pointer to data. */
+        float *data_;
 
-    /** \brief descides which data to use for kdtree 
-                0 metric infomation
-                1 normals
-                2 color
-    */
-    int mode_;
+        /** \brief Tree dimensionality (i.e. the number of dimensions per point). */
+        int dim_;
 
-  };
+        /** \brief A FLANN index object. */
+        flann::Index<flann::L2_Simple<float> > *flann_index_;
+
+        /** \brief descides which data to use for kdtree
+                    0 metric infomation
+                    1 normals
+                    2 color
+        */
+        int mode_;
+
+    };
 }
 
 #include "kdtree_flann.hpp"

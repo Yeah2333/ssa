@@ -32,59 +32,60 @@
 
 namespace ssa {
 
-  template <typename EdgeType1, typename EdgeType2, typename EdgeType3>
-  class SparseSurfaceAdjustmentT{
+    template<typename EdgeType1, typename EdgeType2, typename EdgeType3>
+    class SparseSurfaceAdjustmentT {
 
-    typedef SparseSurfaceAdjustmentGraphT<EdgeType1, EdgeType2, EdgeType3> SSAGraph;
-    typedef typename EdgeType2::VertexXiType   PoseVertex;
-    typedef typename EdgeType2::VertexXjType   PointVertex;
-    static const int Dj = EdgeType2::Dimension;
-    typedef Eigen::Matrix<double, Dj, 1> PointVector;
+        typedef SparseSurfaceAdjustmentGraphT<EdgeType1, EdgeType2, EdgeType3> SSAGraph;
+        typedef typename EdgeType2::VertexXiType PoseVertex;
+        typedef typename EdgeType2::VertexXjType PointVertex;
+        static const int Dj = EdgeType2::Dimension;
+        typedef Eigen::Matrix<double, Dj, 1> PointVector;
     public:
 
-    SparseSurfaceAdjustmentT();
-    ~SparseSurfaceAdjustmentT();
+        SparseSurfaceAdjustmentT();
 
-    /** \brief inserts an existing graph */ 
-    void setGraph(SSAGraph& graph);
+        ~SparseSurfaceAdjustmentT();
 
-    /** \brief direct access to graph */ 
-    SSAGraph* graph();
+        /** \brief inserts an existing graph */
+        void setGraph(SSAGraph &graph);
 
-    /** \brief set the sparse linear solver for optimization */ 
-    void setSolver(g2o::BlockSolverX::LinearSolverType*& linearSolver);
+        /** \brief direct access to graph */
+        SSAGraph *graph();
 
-    /** \brief show verbose outputs */ 
-    void setVerbose(bool verbose);
+        /** \brief set the sparse linear solver for optimization */
+        void setSolver(g2o::BlockSolverX::LinearSolverType *&linearSolver);
 
-    /** \brief set ssa params*/ 
-    void setParams(SparseSurfaceAdjustmentParams& params);
+        /** \brief show verbose outputs */
+        void setVerbose(bool verbose);
 
-    /** \brief direct access to params */ 
-    SparseSurfaceAdjustmentParams& params();
+        /** \brief set ssa params*/
+        void setParams(SparseSurfaceAdjustmentParams &params);
 
-    /** \brief perform optimization */
-    void optimize(int level = 0);
+        /** \brief direct access to params */
+        SparseSurfaceAdjustmentParams &params();
 
-    /** \brief perform optimization */
-    void optimizeHierarchical(int startLevel = 0);
+        /** \brief perform optimization */
+        void optimize(int level = 0);
 
-    /** \brief Optimize color information with mean filter */
-    void optimizeColors();
+        /** \brief perform optimization */
+        void optimizeHierarchical(int startLevel = 0);
 
-    /** \brief Optimize color information with weighted mean filter. 
-        \brief Weights are calculated from the incidence angle.
-    */
-    void optimizeColorsIncidenteWeight();
+        /** \brief Optimize color information with mean filter */
+        void optimizeColors();
 
-    void dumpConnectivityMatrix();
+        /** \brief Optimize color information with weighted mean filter.
+            \brief Weights are calculated from the incidence angle.
+        */
+        void optimizeColorsIncidenteWeight();
 
-    SSAGraph graph_;
+        void dumpConnectivityMatrix();
+
+        SSAGraph graph_;
 
     protected:
-      bool verbose_;
-      SparseSurfaceAdjustmentParams params_;
-  };
+        bool verbose_;
+        SparseSurfaceAdjustmentParams params_;
+    };
 
 } //end namespace
 

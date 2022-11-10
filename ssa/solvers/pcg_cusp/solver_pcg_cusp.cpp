@@ -32,43 +32,47 @@
 
 namespace g2o {
 
-  static Solver* createSolver(SparseOptimizer* opt, const std::string& solverName)
-  {
-    g2o::Solver* s = 0;
+    static Solver *createSolver(SparseOptimizer *opt, const std::string &solverName) {
+        g2o::Solver *s = 0;
 
-    if (solverName == "pcgcusp") {
-      ALLOC_pcgcusp(s, -1, -1);
-    }
-    else if (solverName == "pcgcusp3_2") {
-      ALLOC_pcgcusp(s, 3, 2);
-    }
-    else if (solverName == "pcgcusp6_3") {
-      ALLOC_pcgcusp(s, 6, 3);
-    }
-    else if (solverName == "pcgcusp7_3") {
-      ALLOC_pcgcusp(s, 7, 3);
+        if (solverName == "pcgcusp") {
+            ALLOC_pcgcusp(s, -1, -1);
+        } else if (solverName == "pcgcusp3_2") {
+            ALLOC_pcgcusp(s, 3, 2);
+        } else if (solverName == "pcgcusp6_3") {
+            ALLOC_pcgcusp(s, 6, 3);
+        } else if (solverName == "pcgcusp7_3") {
+            ALLOC_pcgcusp(s, 7, 3);
+        }
+
+        return s;
     }
 
-    return s;
-  }
-
-  class pcgcuspSolverCreator : public AbstractSolverCreator
-  {
+    class pcgcuspSolverCreator : public AbstractSolverCreator {
     public:
-      pcgcuspSolverCreator(const SolverProperty& p) : AbstractSolverCreator(p) {}
-      virtual Solver* construct(SparseOptimizer* optimizer)
-      {
-        return createSolver(optimizer, property().name);
-      }
-  };
+        pcgcuspSolverCreator(const SolverProperty &p) : AbstractSolverCreator(p) {}
 
-  void G2O_ATTRIBUTE_CONSTRUCTOR init_solver_csparse()
-  {
-    SolverFactory* factory = SolverFactory::instance();
-    factory->registerSolver(new pcgcuspSolverCreator(SolverProperty("pcgcusp", "CUDA/CUSP Conjugate Gradient solver (variable blocksize)", "PCGCUSP", false, -1, -1)));
-    factory->registerSolver(new pcgcuspSolverCreator(SolverProperty("pcgcusp3_2", "CUDA Conjugate Gradient solver (fixed blocksize)", "PCGCUSP", true, 3, 2)));
-    factory->registerSolver(new pcgcuspSolverCreator(SolverProperty("pcgcusp6_3", "CUDA Conjugate Gradient solver (fixed blocksize)", "PCGCUSP", true, 6, 3)));
-    factory->registerSolver(new pcgcuspSolverCreator(SolverProperty("pcgcusp7_3", "CUDA Conjugate Gradient solver (fixed blocksize)", "PCGCUSP", true, 7, 3)));
-  }
+        virtual Solver *construct(SparseOptimizer *optimizer) {
+            return createSolver(optimizer, property().name);
+        }
+    };
 
-  }
+    void G2O_ATTRIBUTE_CONSTRUCTOR
+
+    init_solver_csparse() {
+        SolverFactory *factory = SolverFactory::instance();
+        factory->registerSolver(new pcgcuspSolverCreator(
+                SolverProperty("pcgcusp", "CUDA/CUSP Conjugate Gradient solver (variable blocksize)", "PCGCUSP", false,
+                               -1, -1)));
+        factory->registerSolver(new pcgcuspSolverCreator(
+                SolverProperty("pcgcusp3_2", "CUDA Conjugate Gradient solver (fixed blocksize)", "PCGCUSP", true, 3,
+                               2)));
+        factory->registerSolver(new pcgcuspSolverCreator(
+                SolverProperty("pcgcusp6_3", "CUDA Conjugate Gradient solver (fixed blocksize)", "PCGCUSP", true, 6,
+                               3)));
+        factory->registerSolver(new pcgcuspSolverCreator(
+                SolverProperty("pcgcusp7_3", "CUDA Conjugate Gradient solver (fixed blocksize)", "PCGCUSP", true, 7,
+                               3)));
+    }
+
+}

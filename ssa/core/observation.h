@@ -26,51 +26,61 @@
 
 namespace ssa {
 
-  template <typename VertexType>
-  class Observation : public std::vector<VertexType* >
-  {
+    template<typename VertexType>
+    class Observation : public std::vector<VertexType *> {
 
-    static const int Dimension = VertexType::Dimension;
-    typedef Eigen::Matrix<double, Dimension, 1> PointVector;
-    typedef Eigen::Matrix<double, Dimension, Dimension> PointMatrix;
+        static const int Dimension = VertexType::Dimension;
+        typedef Eigen::Matrix<double, Dimension, 1> PointVector;
+        typedef Eigen::Matrix<double, Dimension, Dimension> PointMatrix;
 
-    typedef KDTreeFlannT<VertexType>     PointTree;
+        typedef KDTreeFlannT<VertexType> PointTree;
 
     public:
-    inline Observation(){
-      computedNeighbors = false;
-    }
-    void removeVertex(VertexType*& v);
+        inline Observation() {
+            computedNeighbors = false;
+        }
 
-    /** calculate mean */
-    static PointVector getMean(std::vector<VertexType* >& neighbors);
-    /** calculate covariance */
-    static PointMatrix getCovariance(std::vector<VertexType* >& neighbors, PointVector& mean);
-    
-    /** calculate mean faster */
-    static void getMean(std::vector< VertexType* >& neighbors, size_t size, PointVector& mean);
-    /** calculate cov faster */
-    static void getCovariance(std::vector<VertexType* >& neighbors, size_t size, PointVector& mean, PointMatrix& cov);    
+        void removeVertex(VertexType *&v);
 
-    /** calculates mean and covariance threaded*/
-    static void calcMeanCovThreaded(std::vector<VertexType* >& observation, SparseSurfaceAdjustmentParams& params);
-    /** calculates mean and covariance threaded and caches the neighborhood information */    
-    void calcMeanCovThreadedAndCached(std::vector<VertexType* >& observation, SparseSurfaceAdjustmentParams& params);
+        /** calculate mean */
+        static PointVector getMean(std::vector<VertexType *> &neighbors);
 
-    //!returns a kdtree with all observation vertices of this observation
-    PointTree getKDTree();
+        /** calculate covariance */
+        static PointMatrix getCovariance(std::vector<VertexType *> &neighbors, PointVector &mean);
 
-    void calcMeanCov(double& distance);
-    void calcMeanCovThreaded(SparseSurfaceAdjustmentParams& params);
-    void calcMeanCovThreadedAndCached(SparseSurfaceAdjustmentParams& params);
-    void clearCache();
-  private:
-    void allocNeighborCache(size_t& pointCount, int& maxNeighbors);
-    std::vector< std::vector<VertexType*> > neighbors_;
-    std::vector< size_t > neighbors_count_;
-    //std::map<int, std::deque< VertexType* > > neighbors_;
-    bool computedNeighbors;
-  };
+        /** calculate mean faster */
+        static void getMean(std::vector<VertexType *> &neighbors, size_t size, PointVector &mean);
+
+        /** calculate cov faster */
+        static void
+        getCovariance(std::vector<VertexType *> &neighbors, size_t size, PointVector &mean, PointMatrix &cov);
+
+        /** calculates mean and covariance threaded*/
+        static void calcMeanCovThreaded(std::vector<VertexType *> &observation, SparseSurfaceAdjustmentParams &params);
+
+        /** calculates mean and covariance threaded and caches the neighborhood information */
+        void
+        calcMeanCovThreadedAndCached(std::vector<VertexType *> &observation, SparseSurfaceAdjustmentParams &params);
+
+        //!returns a kdtree with all observation vertices of this observation
+        PointTree getKDTree();
+
+        void calcMeanCov(double &distance);
+
+        void calcMeanCovThreaded(SparseSurfaceAdjustmentParams &params);
+
+        void calcMeanCovThreadedAndCached(SparseSurfaceAdjustmentParams &params);
+
+        void clearCache();
+
+    private:
+        void allocNeighborCache(size_t &pointCount, int &maxNeighbors);
+
+        std::vector<std::vector<VertexType *> > neighbors_;
+        std::vector<size_t> neighbors_count_;
+        //std::map<int, std::deque< VertexType* > > neighbors_;
+        bool computedNeighbors;
+    };
 
 } //end namespace
 

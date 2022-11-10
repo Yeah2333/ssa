@@ -24,49 +24,48 @@
 #include "parameter.h"
 
 namespace ssa {
-  /** \brief  this class stores the local neighborhood information for all available surface vertices
-  */
-  template <typename VertexType>
-  class LocalNeighborhoodT
-  {
+    /** \brief  this class stores the local neighborhood information for all available surface vertices
+    */
+    template<typename VertexType>
+    class LocalNeighborhoodT {
 
-    static const int Dimension = VertexType::Dimension;
-    typedef Eigen::Matrix<double, Dimension, 1> PointVector;
-    typedef Eigen::Matrix<double, Dimension, Dimension> PointMatrix;
+        static const int Dimension = VertexType::Dimension;
+        typedef Eigen::Matrix<double, Dimension, 1> PointVector;
+        typedef Eigen::Matrix<double, Dimension, Dimension> PointMatrix;
 
     public:
-    inline LocalNeighborhoodT(){
-    }
+        inline LocalNeighborhoodT() {
+        }
 
-    void addVertex(VertexType*& v, std::vector<VertexType* >& neighborhood);
+        void addVertex(VertexType *&v, std::vector<VertexType *> &neighborhood);
 
-    void removeVertex(VertexType*& v);
-  
-    /** clear neighbor cache */
-    inline void clear(){ vertex_neighborhood_.clear(); }
+        void removeVertex(VertexType *&v);
 
-    /** create neighborhood cache for full scan */
-    void createFromScan(std::vector<VertexType* >& scan, SparseSurfaceAdjustmentParams& params);
+        /** clear neighbor cache */
+        inline void clear() { vertex_neighborhood_.clear(); }
 
-    /** calculate mean */
-    PointVector getMean(int id);
+        /** create neighborhood cache for full scan */
+        void createFromScan(std::vector<VertexType *> &scan, SparseSurfaceAdjustmentParams &params);
 
-    /** calculate covariance */
-    PointMatrix getCovariance(int id, SparseSurfaceAdjustmentParams& params);
+        /** calculate mean */
+        PointVector getMean(int id);
 
-    /** calculate covariance  */
-    void getCovariance(int id, PointMatrix& cov, SparseSurfaceAdjustmentParams& params);
+        /** calculate covariance */
+        PointMatrix getCovariance(int id, SparseSurfaceAdjustmentParams &params);
 
-    /** access to the neighbors of the vertex with vertexId */
-    std::vector< VertexType* >& neighbors(int vertexId);
+        /** calculate covariance  */
+        void getCovariance(int id, PointMatrix &cov, SparseSurfaceAdjustmentParams &params);
 
-    VertexType* getNearestNeighbor(VertexType* vertex, int neighborhoodId, double& sqrDistance);
+        /** access to the neighbors of the vertex with vertexId */
+        std::vector<VertexType *> &neighbors(int vertexId);
 
-  private:
-    std::map<int, std::vector<VertexType* > >    vertex_neighborhood_;
-  };
+        VertexType *getNearestNeighbor(VertexType *vertex, int neighborhoodId, double &sqrDistance);
 
-  #include "local_neighborhood.hpp"
+    private:
+        std::map<int, std::vector<VertexType *> > vertex_neighborhood_;
+    };
+
+#include "local_neighborhood.hpp"
 
 } //end namespace
 

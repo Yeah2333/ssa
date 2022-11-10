@@ -20,42 +20,47 @@
 #include <vector>
 #include "ssa/kdtree_flann/kdtree_flann.h"
 #include "nearest_neighbor_brute_force.h"
-#include <tr1/unordered_map> 
+#include <tr1/unordered_map>
 
 namespace ssa {
 
-  template <typename EdgeType1, typename EdgeType2, typename EdgeType3>
-  class NearestNeighborKdtreeT : public NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3> {
+    template<typename EdgeType1, typename EdgeType2, typename EdgeType3>
+    class NearestNeighborKdtreeT : public NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3> {
 
-    typedef EdgeType1 SLAMEdgeType;
-    typedef EdgeType2 SensorEdgeType;
-    typedef EdgeType3 DataAssociationEdgeType;
+        typedef EdgeType1 SLAMEdgeType;
+        typedef EdgeType2 SensorEdgeType;
+        typedef EdgeType3 DataAssociationEdgeType;
 
-    typedef typename SensorEdgeType::VertexXjType   PointVertex;
-    static const int Dj = SensorEdgeType::Dimension;
-    typedef Eigen::Matrix<double, Dj, 1> PointVector;
-    typedef Eigen::Matrix<double, Dj, Dj> PointMatrix;
+        typedef typename SensorEdgeType::VertexXjType PointVertex;
+        static const int Dj = SensorEdgeType::Dimension;
+        typedef Eigen::Matrix<double, Dj, 1> PointVector;
+        typedef Eigen::Matrix<double, Dj, Dj> PointMatrix;
 
-    typedef KDTreeFlannT<PointVertex>     PointTree;
+        typedef KDTreeFlannT<PointVertex> PointTree;
 
     public:
 
-    typedef typename NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::CorrespondenceList  CorrespondenceList;
-    typedef typename NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::ScanPairVector      ScanPairVector;
+        typedef typename NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::CorrespondenceList CorrespondenceList;
+        typedef typename NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::ScanPairVector ScanPairVector;
 
 
-    NearestNeighborKdtreeT();
-    ~NearestNeighborKdtreeT();
+        NearestNeighborKdtreeT();
 
-    using NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::apply;
+        ~NearestNeighborKdtreeT();
 
-    /** \brief creates data association edges for all available scan pairs  */
-    void apply(ScanPairVector scanPairs, CorrespondenceList& resultingCorrespondences, SparseSurfaceAdjustmentGraphT<EdgeType1, EdgeType2, EdgeType3>& graph, SparseSurfaceAdjustmentParams& params, int level);
+        using NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::apply;
 
-    /** \brief creates an edge between reference and correspondence */
-    using NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::assign;
+        /** \brief creates data association edges for all available scan pairs  */
+        void apply(ScanPairVector scanPairs, CorrespondenceList &resultingCorrespondences,
+                   SparseSurfaceAdjustmentGraphT<EdgeType1, EdgeType2, EdgeType3> &graph,
+                   SparseSurfaceAdjustmentParams &params, int level);
 
-  };
-  #include "nearest_neighbor_kdtree.hpp"
+        /** \brief creates an edge between reference and correspondence */
+        using NearestNeighborBruteForceT<EdgeType1, EdgeType2, EdgeType3>::assign;
+
+    };
+
+#include "nearest_neighbor_kdtree.hpp"
+
 }
 #endif

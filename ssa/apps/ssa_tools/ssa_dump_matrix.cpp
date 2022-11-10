@@ -25,100 +25,97 @@
 using namespace std;
 using namespace ssa;
 
-const char *message[]={
-  "ssa_dump_matrix: dumps non zero entries of approximated hessian into ssa-matrix-dump.txt",
-  "usage ssa_dump_matrix [options] <ssa_file>",
-  "options:",
-  "-nn    apply pairwise nearest neighbor data association.",
-  "-ns    apply normal shooting data association.",
-  "-tree  use tree approximation as data association strategie.",
-  0
+const char *message[] = {
+        "ssa_dump_matrix: dumps non zero entries of approximated hessian into ssa-matrix-dump.txt",
+        "usage ssa_dump_matrix [options] <ssa_file>",
+        "options:",
+        "-nn    apply pairwise nearest neighbor data association.",
+        "-ns    apply normal shooting data association.",
+        "-tree  use tree approximation as data association strategie.",
+        0
 };
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 
-  const char**v=message;
-  while (*v){
-    cout << *v << endl;
-    v++;
-  }
-
-  // HACK reset numeric locale, we need C
-  setlocale (LC_NUMERIC,"C");
-  int c=1;
-  const char* logfile=0;
-  bool useFullNN = false;
-  bool useNormalShooting = false;
-  bool useTreeNN = false;
-
-  bool useConfigFile = false;
-  const char* configFile=0;
-
-  while (c<argc){
-    if (!strcmp(argv[c],"-debug")){
-//       debug=true;
-      c++;
-    } else 
-    if (!strcmp(argv[c],"-nn")){
-      useFullNN = true;
-      c++;
-    } else
-    if (!strcmp(argv[c],"-ns")){
-      useNormalShooting = true;
-      c++;
-    } else
-    if (!strcmp(argv[c],"-tree")){
-      c++;
-      useTreeNN = true;
-    } else
-    if (!strcmp(argv[c],"-ini")){
-      useConfigFile=true;
-      c++;
-      configFile = argv[c];
-      c++;
-    } else 
-    if (! logfile){
-      logfile=argv[c];
-      c++;
-      break;
+    const char **v = message;
+    while (*v) {
+        cout << *v << endl;
+        v++;
     }
-  }
 
-  if(!logfile){
-    cerr << "Error: no input ssa file given." << endl;
-    exit(0);
-  }
+    // HACK reset numeric locale, we need C
+    setlocale(LC_NUMERIC, "C");
+    int c = 1;
+    const char *logfile = 0;
+    bool useFullNN = false;
+    bool useNormalShooting = false;
+    bool useTreeNN = false;
 
-  /** initialize ssa */
-  SparseSurfaceAdjustmentT<g2o::EdgeSE3, ssa::EdgeSE3PointXYZCov, ssa::EdgePointXYZCovPointXYZCov> ssa;
-  ssa.setVerbose(true);
-  if(logfile){
-    ssa.graph()->load(logfile);
-  }
+    bool useConfigFile = false;
+    const char *configFile = 0;
 
-  /** Load configuration from ini file */
-  if(useConfigFile){
-    ifstream configStream(configFile);
-    ssa.params().readParams(configStream);
-    configStream.close();
-    ssa.params().printParams();
-  }
+    while (c < argc) {
+        if (!strcmp(argv[c], "-debug")) {
+//       debug=true;
+            c++;
+        } else if (!strcmp(argv[c], "-nn")) {
+            useFullNN = true;
+            c++;
+        } else if (!strcmp(argv[c], "-ns")) {
+            useNormalShooting = true;
+            c++;
+        } else if (!strcmp(argv[c], "-tree")) {
+            c++;
+            useTreeNN = true;
+        } else if (!strcmp(argv[c], "-ini")) {
+            useConfigFile = true;
+            c++;
+            configFile = argv[c];
+            c++;
+        } else if (!logfile) {
+            logfile = argv[c];
+            c++;
+            break;
+        }
+    }
 
-  /** recalc data association */
-  if(useFullNN || useNormalShooting || useTreeNN)
-    ssa.graph()->dropDataAssociation();
+    if (!logfile) {
+        cerr << "Error: no input ssa file given." << endl;
+        exit(0);
+    }
 
-  if(useFullNN)
-    NearestNeighbor<g2o::EdgeSE3, ssa::EdgeSE3PointXYZCov, ssa::EdgePointXYZCovPointXYZCov>::apply(*ssa.graph(), ssa.params().nearestNeighbor);
+    /** initialize ssa */
+    SparseSurfaceAdjustmentT<g2o::EdgeSE3, ssa::EdgeSE3PointXYZCov, ssa::EdgePointXYZCovPointXYZCov> ssa;
+    ssa.setVerbose(true);
+    if (logfile) {
+        ssa.graph()->load(logfile);
+    }
 
-  if(useNormalShooting)
-    NormalShootingFlann<g2o::EdgeSE3, ssa::EdgeSE3PointXYZCov, ssa::EdgePointXYZCovPointXYZCov>::shootNormals(*ssa.graph(), ssa.params().normalShooting);
+    /** Load configuration from ini file */
+    if (useConfigFile) {
+        ifstream configStream(configFile);
+        ssa.params().readParams(configStream);
+        configStream.close();
+        ssa.params().printParams();
+    }
 
-  if(useTreeNN){
-    NearestNeighbor<g2o::EdgeSE3, ssa::EdgeSE3PointXYZCov, ssa::EdgePointXYZCovPointXYZCov>::applyStarAssignment(*ssa.graph(), ssa.params().nearestNeighbor);
-    //NearestNeighbor<g2o::EdgeSE3, ssa::EdgeSE3PointXYZCov, ssa::EdgePointXYZCovPointXYZCov>::pruneToMinSpanTree(*ssa.graph());
-  }
+    /** recalc data association */
+    if (useFullNN || useNormalShooting || useTreeNN)
+        ssa.graph()->dropDataAssociation();
 
-  ssa.dumpConnectivityMatrix();
+    if (useFullNN)
+        NearestNeighbor<g2o::EdgeSE3, ssa::EdgeSE3PointXYZCov, ssa::EdgePointXYZCovPointXYZCov>::apply(*ssa.graph(),
+                                                                                                       ssa.params().nearestNeighbor);
+
+    if (useNormalShooting)
+        NormalShootingFlann<g2o::EdgeSE3, ssa::EdgeSE3PointXYZCov, ssa::EdgePointXYZCovPointXYZCov>::shootNormals(
+                *ssa.graph(), ssa.params().normalShooting);
+
+    if (useTreeNN) {
+        NearestNeighbor<g2o::EdgeSE3, ssa::EdgeSE3PointXYZCov, ssa::EdgePointXYZCovPointXYZCov>::applyStarAssignment(
+                *ssa.graph(), ssa.params().nearestNeighbor);
+        //NearestNeighbor<g2o::EdgeSE3, ssa::EdgeSE3PointXYZCov, ssa::EdgePointXYZCovPointXYZCov>::pruneToMinSpanTree(*ssa.graph());
+    }
+
+    ssa.dumpConnectivityMatrix();
 }

@@ -22,25 +22,26 @@
 #include <cusp/csr_matrix.h>
 #include <cusp/krylov/cg.h>
 #include <cusp/krylov/bicgstab.h>
- 
+
 #include "EXTERNAL/g2o/g2o/stuff/timeutil.h"
 
 namespace g2o {
 
-  SolverCUSPCG::SolverCUSPCG() { };
-  SolverCUSPCG::~SolverCUSPCG() { };
+    SolverCUSPCG::SolverCUSPCG() {};
 
-  bool SolverCUSPCG::solve(double* A, int* ptr, int* indices, int cols, int nz, double* x, double* b){
+    SolverCUSPCG::~SolverCUSPCG() {};
 
-    cusp::array1d<double,cusp::host_memory> x_cusp_host;
-    cusp::csr_matrix<int,double,cusp::device_memory>  A_ccs_cusp_device(cols, cols, nz);
-    cusp::array1d<double,cusp::device_memory> x_cusp_device(A_ccs_cusp_device.num_rows, 0.0);
-    cusp::array1d<double,cusp::device_memory> b_cusp_device(A_ccs_cusp_device.num_rows);
+    bool SolverCUSPCG::solve(double *A, int *ptr, int *indices, int cols, int nz, double *x, double *b) {
 
-    thrust::copy(A, A + nz, A_ccs_cusp_device.values.begin());
-    thrust::copy(indices, indices + nz, A_ccs_cusp_device.column_indices.begin());
-    thrust::copy(ptr, ptr + cols + 1, A_ccs_cusp_device.row_offsets.begin());
-    thrust::copy(b, b + cols, b_cusp_device.begin());
+        cusp::array1d<double, cusp::host_memory> x_cusp_host;
+        cusp::csr_matrix<int, double, cusp::device_memory> A_ccs_cusp_device(cols, cols, nz);
+        cusp::array1d<double, cusp::device_memory> x_cusp_device(A_ccs_cusp_device.num_rows, 0.0);
+        cusp::array1d<double, cusp::device_memory> b_cusp_device(A_ccs_cusp_device.num_rows);
+
+        thrust::copy(A, A + nz, A_ccs_cusp_device.values.begin());
+        thrust::copy(indices, indices + nz, A_ccs_cusp_device.column_indices.begin());
+        thrust::copy(ptr, ptr + cols + 1, A_ccs_cusp_device.row_offsets.begin());
+        thrust::copy(b, b + cols, b_cusp_device.begin());
 
 //     cusp::csr_matrix<int,double,cusp::device_memory>  At_ccs_cusp_device(cols, cols, nz);
 //     cusp::transpose(A_ccs_cusp_device, At_ccs_cusp_device);
@@ -61,43 +62,43 @@ namespace g2o {
 //     At_ccs_cusp_device = At_ccs_cusp_host;
 //     cusp::add(A_ccs_cusp_device, At_ccs_cusp_device, A_ccs_cusp_device);
 
-    cusp::convergence_monitor<double> monitor(b_cusp_device, cols, 1e-8);
+        cusp::convergence_monitor<double> monitor(b_cusp_device, cols, 1e-8);
 
-    // set preconditioner (identity)
-    //cusp::identity_operator<double,cusp::device_memory> M(A_ccs_cusp_device.num_rows, A_ccs_cusp_device.num_rows);
+        // set preconditioner (identity)
+        //cusp::identity_operator<double,cusp::device_memory> M(A_ccs_cusp_device.num_rows, A_ccs_cusp_device.num_rows);
 
-    // setup preconditioner Jacoby
-    cusp::precond::diagonal<double, cusp::device_memory> M(A_ccs_cusp_device);
+        // setup preconditioner Jacoby
+        cusp::precond::diagonal<double, cusp::device_memory> M(A_ccs_cusp_device);
 
-    // solve the linear system A * x = b with the Conjugate Gradient method
-    cusp::krylov::cg(A_ccs_cusp_device, x_cusp_device, b_cusp_device, monitor, M);
-    x_cusp_host = x_cusp_device;
-    // copy x back
-    for (int i = 0; i < cols; i++) {
-      x[i] = x_cusp_host[i];
-    } 
-    return true;
-  }
+        // solve the linear system A * x = b with the Conjugate Gradient method
+        cusp::krylov::cg(A_ccs_cusp_device, x_cusp_device, b_cusp_device, monitor, M);
+        x_cusp_host = x_cusp_device;
+        // copy x back
+        for (int i = 0; i < cols; i++) {
+            x[i] = x_cusp_host[i];
+        }
+        return true;
+    }
 
-  bool SolverCUSPCG::solveWithTiming(double* A, int* ptr, int* indices, int cols, int nz, double* x, double* b){
+    bool SolverCUSPCG::solveWithTiming(double *A, int *ptr, int *indices, int cols, int nz, double *x, double *b) {
 
-    double timing = get_time();
-    cerr << "allocating memory...  \t ";
-    cusp::array1d<double,cusp::host_memory> x_cusp_host;
+        double timing = get_time();
+        cerr << "allocating memory...  \t ";
+        cusp::array1d<double, cusp::host_memory> x_cusp_host;
 
-    // copy to the device
-    cusp::csr_matrix<int,double,cusp::device_memory>  A_ccs_cusp_device(cols, cols, nz);
-    cusp::array1d<double,cusp::device_memory> x_cusp_device(A_ccs_cusp_device.num_rows, 0.0);
-    cusp::array1d<double,cusp::device_memory> b_cusp_device(A_ccs_cusp_device.num_rows);
-    cerr << "done in " << (get_time() - timing) * 1000 << " ms." << endl;
+        // copy to the device
+        cusp::csr_matrix<int, double, cusp::device_memory> A_ccs_cusp_device(cols, cols, nz);
+        cusp::array1d<double, cusp::device_memory> x_cusp_device(A_ccs_cusp_device.num_rows, 0.0);
+        cusp::array1d<double, cusp::device_memory> b_cusp_device(A_ccs_cusp_device.num_rows);
+        cerr << "done in " << (get_time() - timing) * 1000 << " ms." << endl;
 
-    timing = get_time();
-    cerr << "copy data to gpu...  \t";
-    thrust::copy(A, A + nz, A_ccs_cusp_device.values.begin());
-    thrust::copy(indices, indices + nz, A_ccs_cusp_device.column_indices.begin());
-    thrust::copy(ptr, ptr + cols + 1, A_ccs_cusp_device.row_offsets.begin());
-    thrust::copy(b, b + cols, b_cusp_device.begin());
-    cerr << "done in " << (get_time() - timing) * 1000 << " ms." << endl;
+        timing = get_time();
+        cerr << "copy data to gpu...  \t";
+        thrust::copy(A, A + nz, A_ccs_cusp_device.values.begin());
+        thrust::copy(indices, indices + nz, A_ccs_cusp_device.column_indices.begin());
+        thrust::copy(ptr, ptr + cols + 1, A_ccs_cusp_device.row_offsets.begin());
+        thrust::copy(b, b + cols, b_cusp_device.begin());
+        cerr << "done in " << (get_time() - timing) * 1000 << " ms." << endl;
 
 //     timing = get_time();
 //     cerr << "csr upper to csr full ... \t";
@@ -124,32 +125,32 @@ namespace g2o {
 //     cusp::add(A_ccs_cusp_device, Atmp, A_ccs_cusp_device);
 //     cerr << "done in " << (get_time() - timing) * 1000 << " ms." << endl;
 
-    cerr << "running conjugate gradient with jacoby preconditioner... \t";
-    // set stopping criteria:
-    //  iteration_limit    = 100
-    //  relative_tolerance = 1e-3
-    cusp::convergence_monitor<double> monitor(b_cusp_device, cols, 1e-8);
+        cerr << "running conjugate gradient with jacoby preconditioner... \t";
+        // set stopping criteria:
+        //  iteration_limit    = 100
+        //  relative_tolerance = 1e-3
+        cusp::convergence_monitor<double> monitor(b_cusp_device, cols, 1e-8);
 
-    // set preconditioner (identity)
-    //cusp::identity_operator<double,cusp::device_memory> M(A_ccs_cusp_device.num_rows, A_ccs_cusp_device.num_rows);
+        // set preconditioner (identity)
+        //cusp::identity_operator<double,cusp::device_memory> M(A_ccs_cusp_device.num_rows, A_ccs_cusp_device.num_rows);
 
-    // setup preconditioner Jacoby
-    cusp::precond::diagonal<double, cusp::device_memory> M(A_ccs_cusp_device);
+        // setup preconditioner Jacoby
+        cusp::precond::diagonal<double, cusp::device_memory> M(A_ccs_cusp_device);
 
-    // solve the linear system A * x = b with the Conjugate Gradient method
-    cusp::krylov::cg(A_ccs_cusp_device, x_cusp_device, b_cusp_device, monitor, M);
-    cerr << "done in " << (get_time() - timing) * 1000 << " ms." << endl;
+        // solve the linear system A * x = b with the Conjugate Gradient method
+        cusp::krylov::cg(A_ccs_cusp_device, x_cusp_device, b_cusp_device, monitor, M);
+        cerr << "done in " << (get_time() - timing) * 1000 << " ms." << endl;
 
-    timing = get_time();
-    cerr << "copy result back to host memory... \t";
-    x_cusp_host = x_cusp_device;
-    // copy x back
-    for (int i = 0; i < cols; i++) {
-      x[i] = x_cusp_host[i];
-    } 
-    cerr << "done in " << (get_time() - timing) * 1000 << " ms." << endl;
-    return true;
-  }
+        timing = get_time();
+        cerr << "copy result back to host memory... \t";
+        x_cusp_host = x_cusp_device;
+        // copy x back
+        for (int i = 0; i < cols; i++) {
+            x[i] = x_cusp_host[i];
+        }
+        cerr << "done in " << (get_time() - timing) * 1000 << " ms." << endl;
+        return true;
+    }
 
 }// end namespace
 

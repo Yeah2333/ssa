@@ -33,45 +33,43 @@ using namespace std;
 using namespace g2o;
 using namespace ssa;
 
-const char *message[]={
-  "ssa_from_posegraph: converts gm2dl file into a ssa graph file",
-  "usage ssa_from_posegraph [options] <gm2dl_file> <ssa_file>",
-  "options:",
-  "-window [meter]     radius of the neighorhood search for the normal calculation.",
-  0
+const char *message[] = {
+        "ssa_from_posegraph: converts gm2dl file into a ssa graph file",
+        "usage ssa_from_posegraph [options] <gm2dl_file> <ssa_file>",
+        "options:",
+        "-window [meter]     radius of the neighorhood search for the normal calculation.",
+        0
 };
 
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 
- if (argc<2){
-    const char**v=message;
-    while (*v){
-      cout << *v << endl;
-      v++;
+    if (argc < 2) {
+        const char **v = message;
+        while (*v) {
+            cout << *v << endl;
+            v++;
+        }
+        return 0;
     }
-    return 0;
-  }
 
-  bool debug=false;
-  //double maxrange=82;
+    bool debug = false;
+    //double maxrange=82;
 
-  const char* logfile=0;
-  const char* outputFile=0;
-  double windowSize = 0.5; //radius
+    const char *logfile = 0;
+    const char *outputFile = 0;
+    double windowSize = 0.5; //radius
 
-  int c=1;
-  while (c<argc){
-    if (!strcmp(argv[c],"-debug")){
-      debug=true;
-      c++;
-    } else
-    if (!strcmp(argv[c],"-window")){
-      c++;
-      windowSize=atof(argv[c]);
-      c++;
-    } else
+    int c = 1;
+    while (c < argc) {
+        if (!strcmp(argv[c], "-debug")) {
+            debug = true;
+            c++;
+        } else if (!strcmp(argv[c], "-window")) {
+            c++;
+            windowSize = atof(argv[c]);
+            c++;
+        } else
 //     if (!strcmp(argv[c],"-cutoff")){
 //       c++;
 //       cutoff=atof(argv[c]);
@@ -82,35 +80,35 @@ int main(int argc, char **argv)
 //       maxrange=atof(argv[c]);
 //       c++;
 //     } else
-    if (! logfile){
-      logfile=argv[c];
-      c++;
-    } else
-    if (! outputFile){
-      outputFile=argv[c];
-      c++;
-      break;
+        if (!logfile) {
+            logfile = argv[c];
+            c++;
+        } else if (!outputFile) {
+            outputFile = argv[c];
+            c++;
+            break;
+        }
     }
-  }
-  cerr << logfile << " >> " << outputFile << std::endl;
+    cerr << logfile << " >> " << outputFile << std::endl;
 
-  SparseSurfaceAdjustmentGraph2D ssaGraph;
-  SSAPoseGraph2D::importPoseGraph2D(logfile, ssaGraph);
-  cerr << "constructed graph with " << ssaGraph._optimizer.vertices().size() << " vertices and " << ssaGraph._optimizer.edges().size() << " edges." << endl;
+    SparseSurfaceAdjustmentGraph2D ssaGraph;
+    SSAPoseGraph2D::importPoseGraph2D(logfile, ssaGraph);
+    cerr << "constructed graph with " << ssaGraph._optimizer.vertices().size() << " vertices and "
+         << ssaGraph._optimizer.edges().size() << " edges." << endl;
 
-  SparseSurfaceAdjustmentParams ssaParams;
-  ssaParams.normalExtractionMaxNeighborDistance = windowSize;
-  ssaParams.normalExtractionMinNeighbors = 3;
-  ssaParams.normalExtractionMaxNeighbors = 10;
-  ssaGraph.fillNeighborCache(ssaParams);
-  ssaGraph.calcMeanCov(ssaParams);
+    SparseSurfaceAdjustmentParams ssaParams;
+    ssaParams.normalExtractionMaxNeighborDistance = windowSize;
+    ssaParams.normalExtractionMinNeighbors = 3;
+    ssaParams.normalExtractionMaxNeighbors = 10;
+    ssaGraph.fillNeighborCache(ssaParams);
+    ssaGraph.calcMeanCov(ssaParams);
 
-  LaserSensorParams params;
-  params.maxRange = 80.0;
-  params.angularResolution = 0.5;
-  params.sensorPrecision = 0.01;
-  params.scale = 1e-3;
-  LaserSensorModel2D::applySensorModel(ssaGraph, params);
-  ssaGraph.save(outputFile);
+    LaserSensorParams params;
+    params.maxRange = 80.0;
+    params.angularResolution = 0.5;
+    params.sensorPrecision = 0.01;
+    params.scale = 1e-3;
+    LaserSensorModel2D::applySensorModel(ssaGraph, params);
+    ssaGraph.save(outputFile);
 }
 

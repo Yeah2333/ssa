@@ -24,22 +24,25 @@
 
 #include "ssa/core/ssa_graph_2d.h"
 //forward declaration
-namespace g2o{
-  class VertexSE2;
+namespace g2o {
+    class VertexSE2;
 }
 
 namespace ssa {
-  //forward declarations
+    //forward declarations
 
-  class SSAPoseGraph2D {
-  public:
-  SSAPoseGraph2D();
-  ~SSAPoseGraph2D();
+    class SSAPoseGraph2D {
+    public:
+        SSAPoseGraph2D();
 
-  static void importPoseGraph2D(std::string logfile, SparseSurfaceAdjustmentGraph2D& ssaGraph);
-  static void importRobotLaser(std::istream& is, g2o::VertexSE2* parent, SparseSurfaceAdjustmentGraph2D& ssaGraph);
+        ~SSAPoseGraph2D();
 
-  };
+        static void importPoseGraph2D(std::string logfile, SparseSurfaceAdjustmentGraph2D &ssaGraph);
+
+        static void
+        importRobotLaser(std::istream &is, g2o::VertexSE2 *parent, SparseSurfaceAdjustmentGraph2D &ssaGraph);
+
+    };
 
 } //end namespace
 

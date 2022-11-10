@@ -8,15 +8,15 @@ INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURR
 
 
 ADD_EXECUTABLE(ssa_from_posegraph2d
-  posegraph2ssa.cpp
-  import_posegraph2d.cpp
-)
+        posegraph2ssa.cpp
+        import_posegraph2d.cpp
+        )
 
 TARGET_LINK_LIBRARIES(ssa_from_posegraph2d ssa_core types sensor_models g2o_core g2o_types_slam2d ${QT_QTXML_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY})
 
 
 INSTALL(TARGETS ssa_from_posegraph2d
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-)
+        RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+        LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+        )

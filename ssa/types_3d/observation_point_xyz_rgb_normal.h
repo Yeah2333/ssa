@@ -21,32 +21,34 @@
 
 namespace ssa {
 
-  /** \brief: SSA class for single observation of a surface point
-   *
-   * This point vertices represent the observed surface,
-   * which will be adapted during optimization.
-   *
-   */
+    /** \brief: SSA class for single observation of a surface point
+     *
+     * This point vertices represent the observed surface,
+     * which will be adapted during optimization.
+     *
+     */
 
-  class ObservationXYZRGBNormal
-  {
+    class ObservationXYZRGBNormal {
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-      Eigen::Vector3d measurement;
-      Eigen::Vector3d estimate;
-      Eigen::Vector3d normal;
-      Eigen::Vector3i rgb;
-      unsigned short level;
+        Eigen::Vector3d measurement;
+        Eigen::Vector3d estimate;
+        Eigen::Vector3d normal;
+        Eigen::Vector3i rgb;
+        unsigned short level;
 
 
-      ObservationXYZRGBNormal();
-      ObservationXYZRGBNormal(Eigen::Vector3d& measurement, Eigen::Vector3d& estimate, Eigen::Vector3d& normal, Eigen::Vector3i& rgb, int level = 0);
+        ObservationXYZRGBNormal();
 
-      bool read(std::istream& is);
-      bool write(std::ostream& os) const;
+        ObservationXYZRGBNormal(Eigen::Vector3d &measurement, Eigen::Vector3d &estimate, Eigen::Vector3d &normal,
+                                Eigen::Vector3i &rgb, int level = 0);
 
-  };
+        bool read(std::istream &is);
+
+        bool write(std::ostream &os) const;
+
+    };
 
 }
 #endif

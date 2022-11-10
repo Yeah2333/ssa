@@ -24,75 +24,80 @@
 
 //forward declaration
 namespace g2o {
-  class VertexSE3;
+    class VertexSE3;
 }
 
 namespace ssa {
-  //forward declaration
-  class EdgeSE3PointXYZCov;
+    //forward declaration
+    class EdgeSE3PointXYZCov;
 
-  /** \brief: Vertex class for SSA surface points
-   *  
-   * This point vertices represent the observed surface, 
-   * which will be adapted during optimization.
-   * 
-   */
-  
-  class VertexPointXYZCov : public g2o::VertexPointXYZ
-  {
+    /** \brief: Vertex class for SSA surface points
+     *
+     * This point vertices represent the observed surface,
+     * which will be adapted during optimization.
+     *
+     */
+
+    class VertexPointXYZCov : public g2o::VertexPointXYZ {
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      explicit VertexPointXYZCov();
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-      VertexPointXYZCov(int id, Eigen::Vector3d estimate);
-  
-      virtual bool read(std::istream& is);
-      virtual bool write(std::ostream& os) const;
+        explicit VertexPointXYZCov();
 
-      /** 
-       * Getter for parent vertex pointer
-       *
-       * @return pointer to sensor pose  
-       */
-      g2o::VertexSE3* parentVertex();
-      g2o::VertexSE3* parentVertex() const;
-      
-      inline int& parentVertexId(){ return _parentVertexId; }
+        VertexPointXYZCov(int id, Eigen::Vector3d estimate);
 
-      /** Get pointer to parent vertices (makes sense in pruned graphs) */
-      std::vector< g2o::VertexSE3* > parentVertices() const;
-      
-      /** Set the pointer to parent vertex */      
-      void setParentVertex(g2o::VertexSE3* pose);
+        virtual bool read(std::istream &is);
 
-      /** update normal and covariance based on point neighborhoods covariance (experimental) */
-      void updateNormal(Eigen::Matrix3d& cov);
-      
-      /** Normal in scan/observation coordinate frame */
-      Eigen::Vector3d& normal();
-      Eigen::Vector3d  normal() const;
-      /** Normal in global coordinate frame */
-      Eigen::Vector3d globalNormal();
-      
-      /** covariance in scan/observation coordinate frame */ 
-      Eigen::Matrix3d covariance() const;
-      Eigen::Matrix3d& covariance();
- 
-      Eigen::Matrix4d covTransform();
+        virtual bool write(std::ostream &os) const;
 
-      /** rgb color information per point */
-      unsigned char cr;
-      unsigned char cg;
-      unsigned char cb;
+        /**
+         * Getter for parent vertex pointer
+         *
+         * @return pointer to sensor pose
+         */
+        g2o::VertexSE3 *parentVertex();
+
+        g2o::VertexSE3 *parentVertex() const;
+
+        inline int &parentVertexId() { return _parentVertexId; }
+
+        /** Get pointer to parent vertices (makes sense in pruned graphs) */
+        std::vector<g2o::VertexSE3 *> parentVertices() const;
+
+        /** Set the pointer to parent vertex */
+        void setParentVertex(g2o::VertexSE3 *pose);
+
+        /** update normal and covariance based on point neighborhoods covariance (experimental) */
+        void updateNormal(Eigen::Matrix3d &cov);
+
+        /** Normal in scan/observation coordinate frame */
+        Eigen::Vector3d &normal();
+
+        Eigen::Vector3d normal() const;
+
+        /** Normal in global coordinate frame */
+        Eigen::Vector3d globalNormal();
+
+        /** covariance in scan/observation coordinate frame */
+        Eigen::Matrix3d covariance() const;
+
+        Eigen::Matrix3d &covariance();
+
+        Eigen::Matrix4d covTransform();
+
+        /** rgb color information per point */
+        unsigned char cr;
+        unsigned char cg;
+        unsigned char cb;
 
     protected:
 
-      g2o::VertexSE3* _parentVertex; /** Sensor pose vertex from which this point was observed */
-      int             _parentVertexId;
-      Eigen::Matrix3d _cov;	    /** Covariance in sensor frame */
-      Eigen::Vector3d _normal;      /** normal in sensor frame (not saved to disk) */
-      bool            _hasNormal;
-  };
+        g2o::VertexSE3 *_parentVertex; /** Sensor pose vertex from which this point was observed */
+        int _parentVertexId;
+        Eigen::Matrix3d _cov;        /** Covariance in sensor frame */
+        Eigen::Vector3d _normal;      /** normal in sensor frame (not saved to disk) */
+        bool _hasNormal;
+    };
 
 }
 #endif

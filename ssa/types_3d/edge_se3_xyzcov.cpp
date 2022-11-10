@@ -17,67 +17,63 @@
 #include "edge_se3_xyzcov.h"
 
 namespace ssa {
-  using namespace Eigen;
-  using namespace g2o;
+    using namespace Eigen;
+    using namespace g2o;
 
-  EdgeSE3PointXYZCov::EdgeSE3PointXYZCov() :
-    g2o::BaseBinaryEdge<3, Eigen::Vector3d, g2o::VertexSE3, VertexPointXYZCov>() , level_(0)
-  {
-  }
+    EdgeSE3PointXYZCov::EdgeSE3PointXYZCov() :
+            g2o::BaseBinaryEdge<3, Eigen::Vector3d, g2o::VertexSE3, VertexPointXYZCov>(), level_(0) {
+    }
 
-  EdgeSE3PointXYZCov::~EdgeSE3PointXYZCov()
-  {
-  }
+    EdgeSE3PointXYZCov::~EdgeSE3PointXYZCov() {
+    }
 
-  bool EdgeSE3PointXYZCov::read(std::istream& is)
-  {
-    /** read measurement*/
-    Eigen::Vector3d p;
-    is >> p[0] >> p[1] >> p[2];
-    setMeasurement(p);
+    bool EdgeSE3PointXYZCov::read(std::istream &is) {
+        /** read measurement*/
+        Eigen::Vector3d p;
+        is >> p[0] >> p[1] >> p[2];
+        setMeasurement(p);
 
-    /** read information matrix */
-    for (int i=0; i<3; i++)
-      for (int j=i; j<3; j++) {
-        is >> information()(i,j);
-        if (i!=j)
-          information()(j,i)=information()(i,j);
-      }
-      
-    /** read level of edge */
-    int l = 0; 
-    is >> l;
-    setLevel(l);
- 
-    return true;
-  }
+        /** read information matrix */
+        for (int i = 0; i < 3; i++)
+            for (int j = i; j < 3; j++) {
+                is >> information()(i, j);
+                if (i != j)
+                    information()(j, i) = information()(i, j);
+            }
 
-  bool EdgeSE3PointXYZCov::write(std::ostream& os) const
-  {
-    /** write original measurement of sensor */
-    for (int i=0; i<3; i++)
-      os << measurement()[i] << " ";
+        /** read level of edge */
+        int l = 0;
+        is >> l;
+        setLevel(l);
 
-    /** write sensor dependent information matrix */
-    for (int i=0; i<3; i++)
-      for (int j=i; j<3; j++){
-        os <<  information()(i,j) << " ";
-      }
-    /** write level of edge (used for hierarchical ssa stuff)*/
-    os << level_;
-    
-    return os.good();
-  }
+        return true;
+    }
 
-  void EdgeSE3PointXYZCov::initialEstimate(const g2o::OptimizableGraph::VertexSet& from_, g2o::OptimizableGraph::Vertex* /*to_*/)
-  {
-    VertexSE3*       from = static_cast<VertexSE3*>(_vertices[0]);
-    VertexPointXYZCov* to = static_cast<VertexPointXYZCov*>(_vertices[1]);
-    if (from_.count(from) > 0)
-      to->setEstimate(from->estimate() * measurement());
-    else
-      std::cerr << __PRETTY_FUNCTION__ << std::endl;
-  }
+    bool EdgeSE3PointXYZCov::write(std::ostream &os) const {
+        /** write original measurement of sensor */
+        for (int i = 0; i < 3; i++)
+            os << measurement()[i] << " ";
+
+        /** write sensor dependent information matrix */
+        for (int i = 0; i < 3; i++)
+            for (int j = i; j < 3; j++) {
+                os << information()(i, j) << " ";
+            }
+        /** write level of edge (used for hierarchical ssa stuff)*/
+        os << level_;
+
+        return os.good();
+    }
+
+    void EdgeSE3PointXYZCov::initialEstimate(const g2o::OptimizableGraph::VertexSet &from_,
+                                             g2o::OptimizableGraph::Vertex * /*to_*/) {
+        VertexSE3 *from = static_cast<VertexSE3 *>(_vertices[0]);
+        VertexPointXYZCov *to = static_cast<VertexPointXYZCov *>(_vertices[1]);
+        if (from_.count(from) > 0)
+            to->setEstimate(from->estimate() * measurement());
+        else
+            std::cerr << __PRETTY_FUNCTION__ << std::endl;
+    }
 
 // #ifndef NUMERIC_JACOBIAN_THREE_D_TYPES
 //   void EdgeSE3PointXYZCov::linearizeOplus()

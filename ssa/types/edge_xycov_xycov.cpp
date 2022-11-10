@@ -17,67 +17,66 @@
 #include "edge_xycov_xycov.h"
 
 namespace ssa {
- using namespace Eigen;
- using namespace g2o;
- EdgePointXYCovPointXYCov::EdgePointXYCovPointXYCov() :
-    BaseBinaryEdge<2, Eigen::Vector2d, VertexPointXYCov, VertexPointXYCov>()
-  {
-  }
+    using namespace Eigen;
+    using namespace g2o;
 
-  void EdgePointXYCovPointXYCov::computeError()
-  {
-    VertexPointXYCov* l1 = static_cast<VertexPointXYCov*>(_vertices[0]);
-    VertexPointXYCov* l2 = static_cast<VertexPointXYCov*>(_vertices[1]);
-    _error = l1->estimate() - l2->estimate();
+    EdgePointXYCovPointXYCov::EdgePointXYCovPointXYCov() :
+            BaseBinaryEdge<2, Eigen::Vector2d, VertexPointXYCov, VertexPointXYCov>() {
+    }
 
-    Vector2d x(1.0, 0.0);
-    Vector2d normal = l1->globalNormal() + l2->globalNormal();
+    void EdgePointXYCovPointXYCov::computeError() {
+        VertexPointXYCov *l1 = static_cast<VertexPointXYCov *>(_vertices[0]);
+        VertexPointXYCov *l2 = static_cast<VertexPointXYCov *>(_vertices[1]);
+        _error = l1->estimate() - l2->estimate();
+
+        Vector2d x(1.0, 0.0);
+        Vector2d normal = l1->globalNormal() + l2->globalNormal();
 //     double diff = rad2deg(acos(l1->globalNormal().normalized().dot(l2->globalNormal().normalized())));
 //     diff = 1.0 - (std::min(diff, 20.0 )/ 20.0);
-    normal.normalize();
-    double angle = acos(normal.dot(x));
-    information().setIdentity();
-    information()(0,0) = 1000; /// corresponds to uncertainty of 1mm
-    information()(1,1) = 1;
-    Eigen::Rotation2Dd rot(-angle);
-    information() = rot.matrix() * information() * rot.matrix().transpose();
-    //information() = l1->covariance().inverse() + l2->covariance().inverse();
-    if(chi2() < 0.0){
-      std::cerr << PVAR(chi2()) << " " <<  l1->covariance().inverse() << " " <<  l2->covariance().inverse() << " " << std::endl;
+        normal.normalize();
+        double angle = acos(normal.dot(x));
+        information().setIdentity();
+        information()(0, 0) = 1000; /// corresponds to uncertainty of 1mm
+        information()(1, 1) = 1;
+        Eigen::Rotation2Dd rot(-angle);
+        information() = rot.matrix() * information() * rot.matrix().transpose();
+        //information() = l1->covariance().inverse() + l2->covariance().inverse();
+        if (chi2() < 0.0) {
+            std::cerr << PVAR(chi2()) << " " << l1->covariance().inverse() << " " << l2->covariance().inverse() << " "
+                      << std::endl;
+        }
     }
-  }
 
-  bool EdgePointXYCovPointXYCov::read(std::istream& is)
-  {
-    Eigen::Vector2d p;
-    is >> p[0] >> p[1];
-    setMeasurement(p);
+    bool EdgePointXYCovPointXYCov::read(std::istream &is) {
+        Eigen::Vector2d p;
+        is >> p[0] >> p[1];
+        setMeasurement(p);
 
-    is >> information()(0,0) >> information()(0,1) >> information()(1,1);
-    information()(1,0) = information()(0,1);
-    return true;
-  }
-
-  bool EdgePointXYCovPointXYCov::write(std::ostream& os) const
-  {
-    os << measurement()[0] << " " << measurement()[1] << " ";
-    os << information()(0,0) << " " << information()(0,1) << " " << information()(1,1);
-    return os.good();
-  }
-
-  void EdgePointXYCovPointXYCov::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
-  {
-    assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexSE2 position by VertexPointXYCov");
-    VertexPointXYCov* vi = static_cast<VertexPointXYCov*>(_vertices[0]);
-    VertexPointXYCov* vj = static_cast<VertexPointXYCov*>(_vertices[1]);
-    if (from.count(vi) > 0 && to == vj) {
-      vj->setEstimate(vi->estimate());
+        is >> information()(0, 0) >> information()(0, 1) >> information()(1, 1);
+        information()(1, 0) = information()(0, 1);
+        return true;
     }
-  }
+
+    bool EdgePointXYCovPointXYCov::write(std::ostream &os) const {
+        os << measurement()[0] << " " << measurement()[1] << " ";
+        os << information()(0, 0) << " " << information()(0, 1) << " " << information()(1, 1);
+        return os.good();
+    }
+
+    void
+    EdgePointXYCovPointXYCov::initialEstimate(const OptimizableGraph::VertexSet &from, OptimizableGraph::Vertex *to) {
+        assert(from.size() == 1 && from.count(_vertices[0]) == 1 &&
+               "Can not initialize VertexSE2 position by VertexPointXYCov");
+        VertexPointXYCov *vi = static_cast<VertexPointXYCov *>(_vertices[0]);
+        VertexPointXYCov *vj = static_cast<VertexPointXYCov *>(_vertices[1]);
+        if (from.count(vi) > 0 && to == vj) {
+            vj->setEstimate(vi->estimate());
+        }
+    }
 
 #ifndef NUMERIC_JACOBIAN_TWO_D_TYPES
-  void EdgePointXYCovPointXYCov::linearizeOplus()
-  {
+
+    void EdgePointXYCovPointXYCov::linearizeOplus() {
 //     const VertexPointXYCov* vi = static_cast<const VertexPointXYCov*>(_vertices[0]);
 //     const VertexPointXYCov* vj = static_cast<const VertexPointXYCov*>(_vertices[1]);
 //     const double& x1           = vi->estimate()[0];
@@ -91,16 +90,17 @@ namespace ssa {
 //     double aux_2 = -aux_1 ;
 //     double aux_3 = sin(th1) ;
 
-    _jacobianOplusXi( 0 , 0 ) = 1;
-    _jacobianOplusXi( 0 , 1 ) = 0;
-    _jacobianOplusXi( 1 , 0 ) = 0;
-    _jacobianOplusXi( 1 , 1 ) = 1;
+        _jacobianOplusXi(0, 0) = 1;
+        _jacobianOplusXi(0, 1) = 0;
+        _jacobianOplusXi(1, 0) = 0;
+        _jacobianOplusXi(1, 1) = 1;
 
-    _jacobianOplusXj( 0 , 0 ) = -1;
-    _jacobianOplusXj( 0 , 1 ) = 0;
-    _jacobianOplusXj( 1 , 0 ) = 0;
-    _jacobianOplusXj( 1 , 1 ) = -1;
-  }
+        _jacobianOplusXj(0, 0) = -1;
+        _jacobianOplusXj(0, 1) = 0;
+        _jacobianOplusXj(1, 0) = 0;
+        _jacobianOplusXj(1, 1) = -1;
+    }
+
 #endif
 
 } //end namespace

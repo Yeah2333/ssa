@@ -17,40 +17,39 @@
 #include "edge_xyzcov_xyzcov.h"
 
 namespace ssa {
- using namespace Eigen;
- using namespace g2o;
- EdgePointXYZCovPointXYZCov::EdgePointXYZCovPointXYZCov() :
-    BaseBinaryEdge<3, Eigen::Vector3d, VertexPointXYZCov, VertexPointXYZCov>()
-  {
-  }
+    using namespace Eigen;
+    using namespace g2o;
 
-  void EdgePointXYZCovPointXYZCov::computeError()
-  {
-    const VertexPointXYZCov* l1 = static_cast<const VertexPointXYZCov*>(_vertices[0]);
-    const VertexPointXYZCov* l2 = static_cast<const VertexPointXYZCov*>(_vertices[1]);
-    _error = l1->estimate() - l2->estimate();
+    EdgePointXYZCovPointXYZCov::EdgePointXYZCovPointXYZCov() :
+            BaseBinaryEdge<3, Eigen::Vector3d, VertexPointXYZCov, VertexPointXYZCov>() {
+    }
 
-    /** this is the way Kurt computes the information matrix
-      // re-define the information matrix
-      // topLeftCorner<3,3>() is the rotation()
-      const Matrix3d transform = ( vp0->estimate().inverse() *  vp1->estimate() ).matrix().topLeftCorner<3,3>();
-      information() = ( cov0 + transform * cov1 * transform.transpose() ).inverse();
-    **/  
+    void EdgePointXYZCovPointXYZCov::computeError() {
+        const VertexPointXYZCov *l1 = static_cast<const VertexPointXYZCov *>(_vertices[0]);
+        const VertexPointXYZCov *l2 = static_cast<const VertexPointXYZCov *>(_vertices[1]);
+        _error = l1->estimate() - l2->estimate();
+
+        /** this is the way Kurt computes the information matrix
+          // re-define the information matrix
+          // topLeftCorner<3,3>() is the rotation()
+          const Matrix3d transform = ( vp0->estimate().inverse() *  vp1->estimate() ).matrix().topLeftCorner<3,3>();
+          information() = ( cov0 + transform * cov1 * transform.transpose() ).inverse();
+        **/
 //     Matrix3d transform = ( l1->parentVertex()->estimate().inverse() *  l2->parentVertex()->estimate() ).matrix().topLeftCorner<3,3>();
 //     information() = ( l1->covariance() + l2->covariance() ).inverse(); ///THIS SHOULD BE RIGHT after changing covariances to local frame
-    information() = (l1->covariance().inverse() + l2->covariance().inverse()) ;
+        information() = (l1->covariance().inverse() + l2->covariance().inverse());
 
-    if(chi2() < 0.0){
-      std::cerr << PVAR(chi2()) << " " <<  l1->covariance().inverse() << " " <<  l2->covariance().inverse() << " " << std::endl;
+        if (chi2() < 0.0) {
+            std::cerr << PVAR(chi2()) << " " << l1->covariance().inverse() << " " << l2->covariance().inverse() << " "
+                      << std::endl;
+        }
     }
-  }
 
-  bool EdgePointXYZCovPointXYZCov::read(std::istream& is)
-  {
-    /** the measurement should always be 0,0,0 and the information matrix is computed in computeError() */
-    Eigen::Vector3d p(0.0,0.0,0.0);
+    bool EdgePointXYZCovPointXYZCov::read(std::istream &is) {
+        /** the measurement should always be 0,0,0 and the information matrix is computed in computeError() */
+        Eigen::Vector3d p(0.0, 0.0, 0.0);
 //     is >> p[0] >> p[1] >> p[2];
-    setMeasurement(p);
+        setMeasurement(p);
 // 
 //     for (int i=0; i<3; i++)
 //       for (int j=i; j<3; j++) {
@@ -58,54 +57,55 @@ namespace ssa {
 //         if (i!=j)
 //           information()(j,i)=information()(i,j);
 //       }
-    return true;
-  }
+        return true;
+    }
 
-  bool EdgePointXYZCovPointXYZCov::write(std::ostream& os) const
-  {
-    /** the measurement should always be 0,0,0 and the information matrix is computed in computeError() */
+    bool EdgePointXYZCovPointXYZCov::write(std::ostream &os) const {
+        /** the measurement should always be 0,0,0 and the information matrix is computed in computeError() */
 //     for (int i=0; i<3; i++)
 //       os << measurement()[i] << " ";
 //     for (int i=0; i<3; i++)
 //       for (int j=i; j<3; j++){
 //         os << " " <<  information()(i,j);
 //       }
-    return os.good();
-  }
-
-  void EdgePointXYZCovPointXYZCov::initialEstimate(const OptimizableGraph::VertexSet& from, OptimizableGraph::Vertex* to)
-  {
-    assert(from.size() == 1 && from.count(_vertices[0]) == 1 && "Can not initialize VertexSE3 position by VertexPointXYZCov");
-    VertexPointXYZCov* vi = static_cast<VertexPointXYZCov*>(_vertices[0]);
-    VertexPointXYZCov* vj = static_cast<VertexPointXYZCov*>(_vertices[1]);
-    if (from.count(vi) > 0 && to == vj) {
-      vj->setEstimate(vi->estimate());
+        return os.good();
     }
-  }
+
+    void
+    EdgePointXYZCovPointXYZCov::initialEstimate(const OptimizableGraph::VertexSet &from, OptimizableGraph::Vertex *to) {
+        assert(from.size() == 1 && from.count(_vertices[0]) == 1 &&
+               "Can not initialize VertexSE3 position by VertexPointXYZCov");
+        VertexPointXYZCov *vi = static_cast<VertexPointXYZCov *>(_vertices[0]);
+        VertexPointXYZCov *vj = static_cast<VertexPointXYZCov *>(_vertices[1]);
+        if (from.count(vi) > 0 && to == vj) {
+            vj->setEstimate(vi->estimate());
+        }
+    }
 
 #ifndef NUMERIC_JACOBIAN_THREE_D_TYPES
-  void EdgePointXYZCovPointXYZCov::linearizeOplus()
-  {
-    _jacobianOplusXi( 0 , 0 ) = 1;
-    _jacobianOplusXi( 0 , 1 ) = 0;
-    _jacobianOplusXi( 0 , 2 ) = 0;
-    _jacobianOplusXi( 1 , 0 ) = 0;
-    _jacobianOplusXi( 1 , 1 ) = 1;
-    _jacobianOplusXi( 1 , 2 ) = 0;
-    _jacobianOplusXi( 2,  0 ) = 0;
-    _jacobianOplusXi( 2 , 1 ) = 0;
-    _jacobianOplusXi( 2 , 2 ) = 1;
 
-    _jacobianOplusXj( 0 , 0 ) = -1;
-    _jacobianOplusXj( 0 , 1 ) = 0;
-    _jacobianOplusXj( 0 , 2 ) = 0;
-    _jacobianOplusXj( 1 , 0 ) = 0;
-    _jacobianOplusXj( 1 , 1 ) = -1;
-    _jacobianOplusXj( 1 , 2 ) = 0;
-    _jacobianOplusXj( 2 , 0 ) = 0;
-    _jacobianOplusXj( 2 , 1 ) = 0;
-    _jacobianOplusXj( 2 , 2 ) = -1;
-  }
+    void EdgePointXYZCovPointXYZCov::linearizeOplus() {
+        _jacobianOplusXi(0, 0) = 1;
+        _jacobianOplusXi(0, 1) = 0;
+        _jacobianOplusXi(0, 2) = 0;
+        _jacobianOplusXi(1, 0) = 0;
+        _jacobianOplusXi(1, 1) = 1;
+        _jacobianOplusXi(1, 2) = 0;
+        _jacobianOplusXi(2, 0) = 0;
+        _jacobianOplusXi(2, 1) = 0;
+        _jacobianOplusXi(2, 2) = 1;
+
+        _jacobianOplusXj(0, 0) = -1;
+        _jacobianOplusXj(0, 1) = 0;
+        _jacobianOplusXj(0, 2) = 0;
+        _jacobianOplusXj(1, 0) = 0;
+        _jacobianOplusXj(1, 1) = -1;
+        _jacobianOplusXj(1, 2) = 0;
+        _jacobianOplusXj(2, 0) = 0;
+        _jacobianOplusXj(2, 1) = 0;
+        _jacobianOplusXj(2, 2) = -1;
+    }
+
 #endif
 
 } //end namespace

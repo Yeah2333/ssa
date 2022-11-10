@@ -39,172 +39,200 @@
 
 namespace ssa {
 
-  //forward declaration
-  class SSASparseOptimizer;
+    //forward declaration
+    class SSASparseOptimizer;
 
-  template <typename EdgeType1, typename EdgeType2, typename EdgeType3>
-  class SparseSurfaceAdjustmentGraphT{
+    template<typename EdgeType1, typename EdgeType2, typename EdgeType3>
+    class SparseSurfaceAdjustmentGraphT {
 
     public:
-    typedef EdgeType1 SLAMEdgeType;
-    typedef EdgeType2 SensorEdgeType;
-    typedef EdgeType3 DataAssociationEdgeType;
+        typedef EdgeType1 SLAMEdgeType;
+        typedef EdgeType2 SensorEdgeType;
+        typedef EdgeType3 DataAssociationEdgeType;
 
-    typedef typename SensorEdgeType::VertexXiType   PoseVertex;
-    static const int Di = SensorEdgeType::Dimension;
-    typedef Eigen::Matrix<double, Di, Di>  PoseMatrix;
+        typedef typename SensorEdgeType::VertexXiType PoseVertex;
+        static const int Di = SensorEdgeType::Dimension;
+        typedef Eigen::Matrix<double, Di, Di> PoseMatrix;
 
-    typedef typename SensorEdgeType::VertexXjType   PointVertex;
-    static const int Dj = SensorEdgeType::Dimension;
-    typedef Eigen::Matrix<double, Dj, 1> PointVector;
-    typedef Eigen::Matrix<double, Dj, Dj> PointMatrix;
+        typedef typename SensorEdgeType::VertexXjType PointVertex;
+        static const int Dj = SensorEdgeType::Dimension;
+        typedef Eigen::Matrix<double, Dj, 1> PointVector;
+        typedef Eigen::Matrix<double, Dj, Dj> PointMatrix;
 
-    //typedef KDTree::KDTree<Dj, PointVertex*, KdTreeAccess>    PointTree;
+        //typedef KDTree::KDTree<Dj, PointVertex*, KdTreeAccess>    PointTree;
 
 
-    SparseSurfaceAdjustmentGraphT();
-    ~SparseSurfaceAdjustmentGraphT();
-  
-    void load(std::string filename);
-    void save(std::string filename);
+        SparseSurfaceAdjustmentGraphT();
 
-    void clear();
+        ~SparseSurfaceAdjustmentGraphT();
 
-    /** This method sets the parent vertex pointer of all 
-        PointVertex vertices and fills the pointer into 
-        type specific vectors for faster and easier access. */
-    void linkNodesToVertices();
-    void fillObservations();
-  
-    //!returns a map with the ids of all scans
-    std::map<int, int> getScanIds();
-    std::vector<int>   getPoseIds();
-  
-    //--------------------------
-    // Mean and covariance stuff
-    //--------------------------
-    void calcMeanCov(SparseSurfaceAdjustmentParams& params);
-    //! calculate mean and covariance of for scan with the given scanId
-    void calcMeanCov(SparseSurfaceAdjustmentParams& params, int scandId);
+        void load(std::string filename);
 
-    /** Fill local observation neighbor cache */
-    void fillNeighborCache(SparseSurfaceAdjustmentParams& params);
+        void save(std::string filename);
 
-    /** Fill local observation neighbor cache of given scan */
-    void fillNeighborCache(SparseSurfaceAdjustmentParams& params, int scanId);
+        void clear();
 
-    /** Access to the local observation neighbor cache */
-    inline LocalNeighborhoodT<PointVertex>& neighborCache(){ return cached_neighbors_;};
+        /** This method sets the parent vertex pointer of all
+            PointVertex vertices and fills the pointer into
+            type specific vectors for faster and easier access. */
+        void linkNodesToVertices();
 
-    /** get the id of the highest level in the hierarchcal graph */
-    inline int getMaxLevel(){return max_level_;}
+        void fillObservations();
 
-    /** Returns a subset of edges from the current graph for the 
-      optimization. The subset contains all edge types for point 
-      vertices  that have a data association to another point 
-      vertex from a different observation.*/
-    g2o::OptimizableGraph::EdgeSet getEdgeset();
-    g2o::OptimizableGraph::EdgeSet getEdgesetFast();
-    g2o::OptimizableGraph::EdgeSet getEdgesetMesh();
-  
-    /** move points that have no data association */
-    void moveUnoptimizedPoints();
+        //!returns a map with the ids of all scans
+        std::map<int, int> getScanIds();
 
-    /** hide not well connected points*/
-    void filterOutlier(int minNeighbors);
+        std::vector<int> getPoseIds();
 
-    //!returns a vector with all observation vertices without the given scan observations
-    std::vector<PointVertex* > getPointVerticesOfScans(int& scanId);
+        //--------------------------
+        // Mean and covariance stuff
+        //--------------------------
+        void calcMeanCov(SparseSurfaceAdjustmentParams &params);
 
-    std::vector<PointVertex* > getPointVerticesOfScan(int& scanId);
-    Observation<PointVertex>&  getObservationOfScan(int& scanId);
-  
-    int addVertex(PoseVertex*& v);
-    int addVertex(PointVertex*& v);
-    int addVertex(PointVertex*& v, std::vector< PointVertex* >& neighbors);
+        //! calculate mean and covariance of for scan with the given scanId
+        void calcMeanCov(SparseSurfaceAdjustmentParams &params, int scandId);
 
-    void removeVertex(PoseVertex*& v);
-    void removeVertex(PointVertex*& v);
+        /** Fill local observation neighbor cache */
+        void fillNeighborCache(SparseSurfaceAdjustmentParams &params);
 
-    void addEdge(SLAMEdgeType*& edge);
-    void addEdge(SensorEdgeType*& edge);
-    void addEdge(PointVertex*& from, PointVertex*& to);
-    void addEdge(DataAssociationEdgeType*& edge);
-    void addEdge(g2o::Edge_V_V_GICP*& edge);
-    DataAssociationEdgeType* createEdge(PointVertex*& from, PointVertex*& to);
+        /** Fill local observation neighbor cache of given scan */
+        void fillNeighborCache(SparseSurfaceAdjustmentParams &params, int scanId);
 
-    void removeEdge(SLAMEdgeType* edge);
-    void removeEdge(SensorEdgeType* edge);
-    void removeEdge(DataAssociationEdgeType* edge);
-  
-    void dropDataAssociation();
-    void fixDataAssociation();
-    void dropSensorEdges();
-    void dropSLAMEdges();
+        /** Access to the local observation neighbor cache */
+        inline LocalNeighborhoodT<PointVertex> &neighborCache() { return cached_neighbors_; };
 
-    void unfixVertices();
-    void setFixedVertices(bool fixed);
+        /** get the id of the highest level in the hierarchcal graph */
+        inline int getMaxLevel() { return max_level_; }
 
-    void pruneGraph(double minDistance);
-    void pruneDataAssociation(int maxEdges);
-    void marginalizeEdges(PoseVertex* v);
+        /** Returns a subset of edges from the current graph for the
+          optimization. The subset contains all edge types for point
+          vertices  that have a data association to another point
+          vertex from a different observation.*/
+        g2o::OptimizableGraph::EdgeSet getEdgeset();
 
-    bool connected(PoseVertex*& v1, PoseVertex*& v2);
-    bool connected(PointVertex*& v1, PointVertex*& v2);
+        g2o::OptimizableGraph::EdgeSet getEdgesetFast();
 
-    bool haveCommonSensorVertex(PointVertex*& v1, PointVertex*& v2); 
+        g2o::OptimizableGraph::EdgeSet getEdgesetMesh();
 
-    void checkGraph();
+        /** move points that have no data association */
+        void moveUnoptimizedPoints();
 
-    Observation<PointVertex>&  observation(int i);
+        /** hide not well connected points*/
+        void filterOutlier(int minNeighbors);
 
-    std::vector<PointVertex* >&  getPointVertices(int poseId, int level);
+        //!returns a vector with all observation vertices without the given scan observations
+        std::vector<PointVertex *> getPointVerticesOfScans(int &scanId);
 
-    /** Applies some heuristics for a sparser (faster) connectivity */
-    void checkConnectivity();
+        std::vector<PointVertex *> getPointVerticesOfScan(int &scanId);
 
-    bool DataAssociationEdgeComp (DataAssociationEdgeType* i,DataAssociationEdgeType* j) { return (i->chi2()<j->chi2()); }
+        Observation<PointVertex> &getObservationOfScan(int &scanId);
 
-    /** Optimizer */
-    SSASparseOptimizer _optimizer;
-    SSASparseOptimizer*   optimizer() { return &_optimizer;};
+        int addVertex(PoseVertex *&v);
 
-    /** Direct access to differnt edgetypes */
-  
-    std::vector<PoseVertex* >                   _verticies_poses;
-    std::vector<PointVertex* >                  _verticies_points;
+        int addVertex(PointVertex *&v);
 
-    /** Caching of point vertices hierarchcal structure. 
-        Will be filled during first call of getPointVertices(poseIdm level).
-        First index is pose vertex id 
-        second index is the level.*/
-    std::map< int, std::map< int, std::vector<PointVertex* > > >  _hierarchical_point_vertex_index;
-    
-    /** Caching of correspondences */
-    std::vector<CorrespondenceT<PointVertex, EdgeType3> >correspondences;
-    //deprecated 
-    std::map< int, Observation<PointVertex> >   _verticies_observations;
+        int addVertex(PointVertex *&v, std::vector<PointVertex *> &neighbors);
 
-    std::vector< SLAMEdgeType* >                _edges_odometry;
-    std::vector< SensorEdgeType* >              _edges_observations;
-    std::vector<DataAssociationEdgeType* >      _edges_data_association;
-    std::vector<g2o::Edge_V_V_GICP* >           _edges_data_association_gicp;
-    std::vector<DataAssociationEdgeType* >      _edges_surface_mesh;
-  
-    std::map<int, std::map<int, bool> >         _fixedDataAssociation;
-    int maxVertexId;
-    
-    /** vertices/edges of points that are not in the current optimization set 
-        are moved accordingly to the resulting observation position */
-    std::vector<SensorEdgeType* >               _edges_points_to_move;
-    std::vector<PointVector, Eigen::aligned_allocator<PointVector> >   _edges_points_to_move_transforms;
+        void removeVertex(PoseVertex *&v);
+
+        void removeVertex(PointVertex *&v);
+
+        void addEdge(SLAMEdgeType *&edge);
+
+        void addEdge(SensorEdgeType *&edge);
+
+        void addEdge(PointVertex *&from, PointVertex *&to);
+
+        void addEdge(DataAssociationEdgeType *&edge);
+
+        void addEdge(g2o::Edge_V_V_GICP *&edge);
+
+        DataAssociationEdgeType *createEdge(PointVertex *&from, PointVertex *&to);
+
+        void removeEdge(SLAMEdgeType *edge);
+
+        void removeEdge(SensorEdgeType *edge);
+
+        void removeEdge(DataAssociationEdgeType *edge);
+
+        void dropDataAssociation();
+
+        void fixDataAssociation();
+
+        void dropSensorEdges();
+
+        void dropSLAMEdges();
+
+        void unfixVertices();
+
+        void setFixedVertices(bool fixed);
+
+        void pruneGraph(double minDistance);
+
+        void pruneDataAssociation(int maxEdges);
+
+        void marginalizeEdges(PoseVertex *v);
+
+        bool connected(PoseVertex *&v1, PoseVertex *&v2);
+
+        bool connected(PointVertex *&v1, PointVertex *&v2);
+
+        bool haveCommonSensorVertex(PointVertex *&v1, PointVertex *&v2);
+
+        void checkGraph();
+
+        Observation<PointVertex> &observation(int i);
+
+        std::vector<PointVertex *> &getPointVertices(int poseId, int level);
+
+        /** Applies some heuristics for a sparser (faster) connectivity */
+        void checkConnectivity();
+
+        bool DataAssociationEdgeComp(DataAssociationEdgeType *i, DataAssociationEdgeType *j) {
+            return (i->chi2() < j->chi2());
+        }
+
+        /** Optimizer */
+        SSASparseOptimizer _optimizer;
+
+        SSASparseOptimizer *optimizer() { return &_optimizer; };
+
+        /** Direct access to differnt edgetypes */
+
+        std::vector<PoseVertex *> _verticies_poses;
+        std::vector<PointVertex *> _verticies_points;
+
+        /** Caching of point vertices hierarchcal structure.
+            Will be filled during first call of getPointVertices(poseIdm level).
+            First index is pose vertex id
+            second index is the level.*/
+        std::map<int, std::map<int, std::vector<PointVertex *> > > _hierarchical_point_vertex_index;
+
+        /** Caching of correspondences */
+        std::vector<CorrespondenceT<PointVertex, EdgeType3> > correspondences;
+        //deprecated
+        std::map<int, Observation<PointVertex> > _verticies_observations;
+
+        std::vector<SLAMEdgeType *> _edges_odometry;
+        std::vector<SensorEdgeType *> _edges_observations;
+        std::vector<DataAssociationEdgeType *> _edges_data_association;
+        std::vector<g2o::Edge_V_V_GICP *> _edges_data_association_gicp;
+        std::vector<DataAssociationEdgeType *> _edges_surface_mesh;
+
+        std::map<int, std::map<int, bool> > _fixedDataAssociation;
+        int maxVertexId;
+
+        /** vertices/edges of points that are not in the current optimization set
+            are moved accordingly to the resulting observation position */
+        std::vector<SensorEdgeType *> _edges_points_to_move;
+        std::vector<PointVector, Eigen::aligned_allocator<PointVector> > _edges_points_to_move_transforms;
 
 
     private:
-    /** caching local neighborhood */
-    LocalNeighborhoodT<PointVertex>             cached_neighbors_;
-    int                                         max_level_;
-  };
+        /** caching local neighborhood */
+        LocalNeighborhoodT<PointVertex> cached_neighbors_;
+        int max_level_;
+    };
 
 } //end namespace
 

@@ -18,25 +18,26 @@
 #define SOLVER_CUSP_CONJUGATE_GRADIENT_H
 
 namespace g2o {
-  using namespace std;
-  /**
-   * \brief linear solver using PCG, pre-conditioner is block Jacobi
-   */
-  class SolverCUDACG 
-  {
+    using namespace std;
+
+    /**
+     * \brief linear solver using PCG, pre-conditioner is block Jacobi
+     */
+    class SolverCUDACG {
     public:
-      SolverCUDACG();
-      ~SolverCUDACG();
+        SolverCUDACG();
 
-      /** Conjugate gradient with double precision */
-      bool solve(double* A, int* ptr, int* indices, int cols, int nz, double* x, double* b);
+        ~SolverCUDACG();
 
-      /** Conjugate gradient with single precision */
-      bool solve(float* A, int* ptr, int* indices, int cols, int nz, float* x, float* b);
+        /** Conjugate gradient with double precision */
+        bool solve(double *A, int *ptr, int *indices, int cols, int nz, double *x, double *b);
+
+        /** Conjugate gradient with single precision */
+        bool solve(float *A, int *ptr, int *indices, int cols, int nz, float *x, float *b);
 
     protected:
 
-  };
+    };
 
 
 }// end namespace
