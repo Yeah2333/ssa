@@ -7,12 +7,13 @@ IF(SSA_BUILD_SUITESPARSE)
     
     ExternalProject_Add(
       g2o
-      GIT_REPOSITORY https://github.com/RainerKuemmerle/g2o.git
-      GIT_TAG "20140601_beforeMergeHierarchical"
+      GIT_REPOSITORY https://github.com/Yeah2333/g2o_ssa.git
+      GIT_TAG "ssa"
       PREFIX ${G2O_INSTALL_PREFIX}
       INSTALL_DIR ${G2O_INSTALL_PREFIX}
       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${G2O_INSTALL_PREFIX}
 		-DBUILD_CSPARSE=NO
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
 		-DCHOLMOD_INCLUDE_DIR=${CHOLMOD_INCLUDE_DIR} 
 		-DCHOLMOD_LIBRARY=${CHOLMOD_LIBRARY} 
 		-DCHOLMOD_LIBRARIES=${CHOLMOD_LIBRARIES} 
@@ -60,12 +61,13 @@ ELSE(SSA_BUILD_SUITESPARSE)
     
     ExternalProject_Add(
       g2o
-      GIT_REPOSITORY https://github.com/RainerKuemmerle/g2o.git
-      GIT_TAG "20140601_beforeMergeHierarchical"
+      GIT_REPOSITORY https://github.com/Yeah2333/g2o_ssa.git
+      GIT_TAG "ssa"
       PREFIX ${G2O_INSTALL_PREFIX}
       INSTALL_DIR ${G2O_INSTALL_PREFIX}
       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${G2O_INSTALL_PREFIX}
 		-DBUILD_CSPARSE=NO
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
     )
   ENDIF(SSA_USE_G2O_GIT)
   

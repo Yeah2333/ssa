@@ -8,7 +8,7 @@ SET(LIB_PREFIX ssa_)
 
 SET(ssa_C_FLAGS)
 SET(ssa_CXX_FLAGS)
-
+set(CMAKE_CXX_FLAGS "-fpermissive -std=c++0x")
 # default built type
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -163,7 +163,7 @@ ENDIF(SSA_BUILD_APPS)
 # ENDIF(G2O_BUILD_EXAMPLES)
 
 
-find_package(PCL 1.5 REQUIRED)
+find_package(PCL 1.8 REQUIRED)
 include_directories(SYSTEM ${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
@@ -200,6 +200,9 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ssa_CXX_FLAGS}")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ssa_C_FLAGS}")
 
 include_directories(${PROJECT_BINARY_DIR} ${ssa_SOURCE_DIR})
+
+find_library(LZ4_LIBRARIES NAMES liblz4.so HINTS "lz4/lib")
+link_libraries(${LZ4_LIBRARIES})
 
 # Include the subdirectories
 ADD_SUBDIRECTORY(EXTERNAL)
